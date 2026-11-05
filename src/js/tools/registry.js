@@ -190,6 +190,92 @@ function createBase64Tool() {
     };
 }
 
+
+function createJsonSchemaTool() {
+    return {
+        id: 'json-schema', category: 'dev', nameKey: 'jsonSchema',
+        descriptionKey: 'jsonSchemaDesc', hintKey: 'jsonSchemaHint',
+        placeholderKey: 'jsonSchemaPlaceholder',
+        keywords: ['power automate', 'parse json', 'schema', 'json schema', 'null', 'typ'],
+        actions: [{
+            id: 'generate', labelKey: 'generate', primary: true,
+            run: (value, language, translate, options) => generateJsonSchema(value, options),
+        }],
+    };
+}
+
+function createJsonDiffTool() {
+    return {
+        id: 'json-diff', category: 'dev', nameKey: 'jsonDiff',
+        descriptionKey: 'jsonDiffDesc', hintKey: 'jsonDiffHint',
+        placeholderKey: 'jsonDiffPlaceholder',
+        keywords: ['compare', 'diff', 'vergleich', 'unterschiede'],
+        actions: [{
+            id: 'compare', labelKey: 'compare', primary: true,
+            run: (value, language, translate, options) => diffJson(value, options.compareInput),
+        }],
+    };
+}
+
+function createRegexTool() {
+    return {
+        id: 'regex', category: 'dev', nameKey: 'regex',
+        descriptionKey: 'regexDesc', hintKey: 'regexHint',
+        placeholderKey: 'regexPlaceholder',
+        keywords: ['regular expression', 'regex', 'regulärer ausdruck', 'pattern'],
+        actions: [{
+            id: 'test', labelKey: 'test', primary: true,
+            run: (value, language, translate, options) => testRegex(value, options.pattern, options.flags),
+        }],
+    };
+}
+
+function createJwtTool() {
+    return {
+        id: 'jwt', category: 'dev', nameKey: 'jwt',
+        descriptionKey: 'jwtDesc', hintKey: 'jwtHint',
+        placeholderKey: 'jwtPlaceholder',
+        keywords: ['token', 'bearer', 'claims', 'decode', 'entra', 'oauth'],
+        actions: [{
+            id: 'decode', labelKey: 'decode', primary: true,
+            run: (value) => decodeJwt(value),
+        }],
+    };
+}
+
+function createXmlTool() {
+    return {
+        id: 'xml', category: 'dev', nameKey: 'xml',
+        descriptionKey: 'xmlDesc', hintKey: 'xmlHint',
+        placeholderKey: 'xmlPlaceholder',
+        keywords: ['xml', 'format', 'validate', 'minify', 'schnittstelle'],
+        actions: [
+            { id: 'format', labelKey: 'format', primary: true, run: (value) => formatXml(value) },
+            { id: 'minify', labelKey: 'minify', run: (value) => minifyXml(value) },
+        ],
+    };
+}
+
+function createUrlTool() {
+    return {
+        id: 'url', category: 'dev', nameKey: 'url',
+        descriptionKey: 'urlDesc', hintKey: 'urlHint',
+        placeholderKey: 'urlPlaceholder',
+        keywords: ['url', 'uri', 'query string', 'parameter', 'sharepoint link'],
+        actions: [{ id: 'parse', labelKey: 'parse', primary: true, run: (value) => parseUrl(value) }],
+    };
+}
+
+function createDateTimeTool() {
+    return {
+        id: 'datetime', category: 'utility', nameKey: 'datetime',
+        descriptionKey: 'datetimeDesc', hintKey: 'datetimeHint',
+        placeholderKey: 'datetimePlaceholder',
+        keywords: ['date', 'time', 'unix', 'timestamp', 'utc', 'iso 8601', 'datum', 'zeit'],
+        actions: [{ id: 'convert', labelKey: 'convert', primary: true, run: (value) => convertDateTime(value) }],
+    };
+}
+
 /** The central registry used to render, search, and open available tools. */
 export const tools = [
     createCalculatorTool(),
