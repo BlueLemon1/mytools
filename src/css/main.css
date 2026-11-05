@@ -177,3 +177,27 @@ button{cursor:pointer}
 }
 @media(max-width:380px){.preference-trigger{padding:0 7px}.pref-trigger-label{min-width:18px}.preference-menu{min-width:150px}}
 @media(prefers-reduced-motion:reduce){.preference-menu{animation:none}}
+
+/* Reduce glossy / glass effects; keep restrained accent glow and interaction feedback */
+.brand-mark{border:0;box-shadow:0 0 16px rgba(241,132,22,.20)}
+.preference-trigger{background:var(--surface-solid);box-shadow:none;backdrop-filter:none}
+.preference-trigger:hover,.preference-trigger[aria-expanded=true]{transform:none;background:var(--soft)}
+.preference-menu{background:var(--surface-solid);box-shadow:0 14px 34px rgba(9,20,32,.14);backdrop-filter:none}
+.hero{box-shadow:0 0 30px rgba(241,132,22,.07),0 14px 35px rgba(13,39,57,.12)}
+.hero::before{background:radial-gradient(circle at 78% 18%,rgba(255,177,93,.14),transparent 27%)}
+.hero::after{box-shadow:0 0 0 38px rgba(255,255,255,.018),0 0 0 78px rgba(255,255,255,.012)}
+.hero-orbit{box-shadow:0 0 0 45px #ffffff05,0 0 0 95px #ffffff03}
+.search-box{background:var(--surface-solid);box-shadow:none;backdrop-filter:none}
+.search-box:focus-within{box-shadow:0 0 0 3px rgba(241,132,22,.10),0 0 18px rgba(241,132,22,.08);transform:none}
+.tool-card{background:var(--surface-solid);box-shadow:none;backdrop-filter:none}
+.tool-card::before{height:2px;opacity:0}
+.tool-card::after{display:none}
+.tool-card:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(241,132,22,.10),0 8px 22px rgba(20,40,60,.07),0 0 20px rgba(241,132,22,.045)}
+.tool-icon,.recent-icon,.dialog-icon{background:var(--accent-soft);box-shadow:none}
+.tool-card-top>span:last-child{box-shadow:none}
+.recent-item{background:var(--surface-solid);box-shadow:none;backdrop-filter:none}
+.recent-item:hover{transform:translateY(-1px);box-shadow:0 0 16px rgba(241,132,22,.06)}
+.action-button.primary{box-shadow:none}
+.action-button.primary:hover{box-shadow:0 0 16px rgba(241,132,22,.14)}
+.tool-dialog{box-shadow:0 24px 75px rgba(0,0,0,.22)}
+@media(prefers-reduced-motion:reduce){.tool-card:hover,.recent-item:hover{transform:none}}
