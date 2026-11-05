@@ -450,8 +450,6 @@ function renderToolOptions(container, tool) {
                 <option value="outputs">outputs('ActionName')</option><option value="triggerBody">triggerBody()</option><option value="item">item()</option>
                 <option value="items">items('Apply_to_each')</option><option value="variables">variables('VariableName')</option><option value="parameters">parameters('ParameterName')</option>
             </select>
-            <label class="field-label" for="expressionArguments">${t('expressionArguments')}</label>
-            <input id="expressionArguments" class="tool-option-input" type="text" placeholder="body('Get_item')?['Title']">
             <p class="tool-option-hint">${t('expressionHint')}</p>
         `,
         powershell: `
@@ -489,7 +487,6 @@ function getToolOptions(container) {
         pattern: $('#regexPattern', container)?.value ?? '',
         flags: $('#regexFlags', container)?.value ?? 'gm',
         expressionName: $('#expressionName', container)?.value ?? 'coalesce',
-        expressionArguments: $('#expressionArguments', container)?.value ?? '',
         powershellSnippet: $('#powershellSnippet', container)?.value ?? 'rest',
         powershellUri: $('#powershellUri', container)?.value ?? '',
         powershellToken: $('#powershellToken', container)?.value ?? '$accessToken',
