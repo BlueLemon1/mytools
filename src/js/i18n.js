@@ -125,7 +125,6 @@ const translations = {
         invalidUrl: 'Ungültige URL.',
         invalidDate: 'Ungültiges Datum oder Zeitformat.',
         regexPatternRequired: 'Bitte einen regulären Ausdruck eingeben.',
-\n
         jsonSchema: 'Power Automate JSON Schema',
         jsonSchemaDesc: 'Erstellt ein Schema für Parse JSON.',
         jsonSchemaHint: 'JSON-Beispiel einfügen und Schema generieren.',
@@ -298,7 +297,6 @@ const translations = {
         invalidUrl: 'Invalid URL.',
         invalidDate: 'Invalid date or time format.',
         regexPatternRequired: 'Enter a regular expression.',
-\n
         jsonSchema: 'Power Automate JSON Schema',
         jsonSchemaDesc: 'Generate a schema for Parse JSON.',
         jsonSchemaHint: 'Paste a JSON sample and generate its schema.',
