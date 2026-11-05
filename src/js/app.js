@@ -28,7 +28,7 @@ const TOOL_ICONS = {
 };
 
 const THEME_LABELS = {
-    de: { auto: 'Automatisch', light: 'Hell', dark: 'Dunkel' },
+    de: { auto: 'System', light: 'Hell', dark: 'Dunkel' },
     en: { auto: 'System', light: 'Light', dark: 'Dark' },
 };
 
