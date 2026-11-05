@@ -216,3 +216,7 @@ button{cursor:pointer}
 .preference-trigger:hover,.preference-trigger[aria-expanded=true]{border-color:rgba(241,132,22,.28);box-shadow:none!important}
 .preference-menu{border:1px solid var(--line);box-shadow:0 12px 28px rgba(9,20,32,.13)}
 .brand-mark{box-shadow:0 0 14px rgba(241,132,22,.18)}
+
+/* Remove the bright edge/highlight on the hero banner; preserve its inner ambient lighting */
+.hero{border:0!important;outline:0!important;box-shadow:0 14px 35px rgba(13,39,57,.12)!important}
+.hero::before{background:radial-gradient(circle at 78% 18%,rgba(255,177,93,.14),transparent 27%)!important}
