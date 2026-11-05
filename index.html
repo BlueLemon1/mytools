@@ -1,27 +1,182 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#132a3c"><title>MyTools – Deine Toolbox</title>
-<style>
-:root{color-scheme:light;--navy:#132a3c;--orange:#f18416;--bg:#f4f6f8;--surface:#fff;--ink:#18232d;--muted:#687784;--line:#e4e9ed;--field:#fff;--soft:#f1f4f6;--shadow:0 12px 34px #132a3c12}[data-theme="dark"]{color-scheme:dark;--navy:#d7e5ef;--orange:#ff9b36;--bg:#111a22;--surface:#1b2833;--ink:#e8eef3;--muted:#a2b0bb;--line:#344450;--field:#17232d;--soft:#263541;--shadow:0 12px 34px #0005}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="dark"]){color-scheme:dark;--navy:#d7e5ef;--orange:#ff9b36;--bg:#111a22;--surface:#1b2833;--ink:#e8eef3;--muted:#a2b0bb;--line:#344450;--field:#17232d;--soft:#263541;--shadow:0 12px 34px #0005}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;transition:background .2s,color .2s}.shell{max-width:1100px;margin:auto;padding:28px 22px 55px}header,.toolbar,footer{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-size:21px;font-weight:800;color:var(--navy)}.header-actions{display:flex;align-items:center;gap:14px}.theme-select{width:auto;min-width:155px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 32px 9px 11px;font:inherit;cursor:pointer}.status,.muted,small{color:var(--muted)}.hero{margin:34px 0;background:var(--navy);color:white;padding:40px;border-radius:22px}.hero span{color:#ffb66d;text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:bold}.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.08;margin:12px 0}.hero p{color:#c4d0d9}.toolbar{margin:28px 0 16px}input,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:11px;width:100%;background:var(--field);color:var(--ink)}input::placeholder,textarea::placeholder{color:var(--muted)}.search{max-width:280px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.tool{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:15px;padding:20px;text-align:left;min-height:140px;cursor:pointer}.tool:hover{border-color:var(--orange);transform:translateY(-2px)}.tool b{display:block;margin:10px 0 4px}.ico{font-size:24px;color:var(--orange)}footer{border-top:1px solid var(--line);margin-top:45px;padding-top:18px;font-size:12px;color:var(--muted)}.modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.panel{background:var(--surface);color:var(--ink);padding:24px;border-radius:18px;width:min(650px,100%);max-height:90vh;overflow:auto}.panelhead,.actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.panel textarea{min-height:140px;margin:12px 0}.btn{border:0;border-radius:9px;padding:10px 14px;background:var(--navy);color:white;cursor:pointer}.btn.hot{background:var(--orange)}.result{background:var(--soft);color:var(--ink);padding:12px;border-radius:9px;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}.hide{display:none!important}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.shell{padding:18px 14px}.hero{padding:26px}.toolbar{align-items:stretch;flex-direction:column}.search{max-width:none}footer{align-items:flex-start;flex-direction:column}}
-</style></head><body><main class="shell"><header><div class="brand">⌘ MyTools</div><div class="header-actions"><div class="status">● Alles lokal im Browser</div><select class="theme-select" id="themeSelect" aria-label="Darstellung wählen"><option value="auto">Automatisch (Browser)</option><option value="light">Light</option><option value="dark">Dark</option></select></div></header>
-<section class="hero"><span>Dein digitaler Werkzeugkasten</span><h1>Weniger suchen.<br>Mehr erledigen.</h1><p>Praktische kleine Helfer für den Alltag – übersichtlich an einem Ort und direkt im Browser nutzbar.</p></section>
-<div class="toolbar"><h2>Alle Werkzeuge</h2><input class="search" id="search" placeholder="Tool suchen …" aria-label="Tools suchen"></div>
-<section class="grid"><button class="tool" data-tool="calc"><span class="ico">＋</span><b>Rechner</b><small>Einfache Berechnungen durchführen</small></button><button class="tool" data-tool="json"><span class="ico">{ }</span><b>JSON Formatter</b><small>JSON formatieren und validieren</small></button><button class="tool" data-tool="text"><span class="ico">Aa</span><b>Text Converter</b><small>Groß-/Kleinschreibung umwandeln</small></button><button class="tool" data-tool="base64"><span class="ico">⇄</span><b>Base64</b><small>Text codieren und decodieren</small></button></section>
-<p class="muted">Weitere Werkzeuge können jederzeit ergänzt werden. Deine Eingaben werden nicht an einen Server übertragen.</p><footer><span>MyTools · Persönliche Toolbox</span><span>Version 1.0</span></footer></main>
-<div class="modal" id="modal"><section class="panel"><div class="panelhead"><h2 id="heading">Tool</h2><button class="btn" id="close">Schließen</button></div><p class="muted" id="hint"></p><textarea id="input" placeholder="Eingabe …"></textarea><div class="actions" id="actions"></div><div class="result" id="result">Ergebnis erscheint hier.</div></section></div>
-<script>
-const $=s=>document.querySelector(s), modal=$('#modal'), input=$('#input'), result=$('#result'), actions=$('#actions');
-const themeSelect=$('#themeSelect'), systemTheme=window.matchMedia('(prefers-color-scheme: dark)');
-function applyTheme(mode){if(mode==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',mode);const dark=mode==='dark'||(mode==='auto'&&systemTheme.matches);document.querySelector('meta[name="theme-color"]').content=dark?'#111a22':'#132a3c'}
-const savedTheme=localStorage.getItem('mytools-theme')||'auto';themeSelect.value=savedTheme;applyTheme(savedTheme);
-themeSelect.addEventListener('change',()=>{localStorage.setItem('mytools-theme',themeSelect.value);applyTheme(themeSelect.value)});
-systemTheme.addEventListener('change',()=>{if(themeSelect.value==='auto')applyTheme('auto')});
-const tools={
-calc:{name:'Rechner',hint:'Unterstützt +, -, *, /, Prozent und Klammern.',buttons:[['Berechnen',()=>{try{let s=input.value.trim();if(!s||!/^[0-9+\\-*/().,%\\s]+$/.test(s))throw 0;let n=Function('"use strict";return ('+s.replace(/%/g,'/100')+')')();if(!Number.isFinite(n))throw 0;result.textContent=new Intl.NumberFormat('de-DE').format(n)}catch{result.textContent='Ungültiger Ausdruck.'}}]]},
-json:{name:'JSON Formatter',hint:'JSON einfügen, formatieren oder minifizieren.',buttons:[['Formatieren',()=>convert(v=>JSON.stringify(JSON.parse(v),null,2))],['Minifizieren',()=>convert(v=>JSON.stringify(JSON.parse(v)))]]},
-text:{name:'Text Converter',hint:'Text umwandeln.',buttons:[['GROSS',()=>result.textContent=input.value.toLocaleUpperCase('de-DE')],['klein',()=>result.textContent=input.value.toLocaleLowerCase('de-DE')],['Title Case',()=>result.textContent=input.value.toLocaleLowerCase('de-DE').replace(/\\b\\p{L}/gu,c=>c.toLocaleUpperCase('de-DE'))],['Trim',()=>result.textContent=input.value.split('\n').map(x=>x.trim()).join('\n').trim()]]},
-base64:{name:'Base64',hint:'UTF-8-Text codieren oder decodieren.',buttons:[['Codieren',()=>{result.textContent=btoa(unescape(encodeURIComponent(input.value)))}],['Decodieren',()=>{try{result.textContent=decodeURIComponent(escape(atob(input.value.trim())))}catch{result.textContent='Ungültiger Base64-Text.'}}]]}
-};
-function convert(fn){try{result.textContent=fn(input.value)}catch(e){result.textContent='Fehler: '+e.message}}
-document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{let t=tools[b.dataset.tool];$('#heading').textContent=t.name;$('#hint').textContent=t.hint;input.value='';result.textContent='Ergebnis erscheint hier.';actions.innerHTML='';t.buttons.forEach(([label,fn])=>{let x=document.createElement('button');x.className='btn hot';x.textContent=label;x.onclick=fn;actions.append(x)});if(b.dataset.tool==='json'){let x=document.createElement('button');x.className='btn';x.textContent='Kopieren';x.onclick=()=>navigator.clipboard.writeText(result.textContent);actions.append(x)}modal.classList.add('open');input.focus()});
-$('#close').onclick=()=>modal.classList.remove('open');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};document.onkeydown=e=>{if(e.key==='Escape')modal.classList.remove('open')};$('#search').oninput=e=>{let q=e.target.value.toLocaleLowerCase('de-DE');document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('hide',!b.innerText.toLocaleLowerCase('de-DE').includes(q)))};
-</script></body></html>
+<html lang="de" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fa">
+  <title>MyTools – Deine Toolbox</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --page:#f5f7fa; --surface:#ffffff; --surface-soft:#f1f4f8; --text:#172635;
+      --muted:#718091; --line:#e4eaf0; --brand:#142f43; --brand-strong:#0d2435;
+      --accent:#f18416; --accent-soft:#fff1e2; --hero-start:#142f43; --hero-end:#204760;
+      --shadow:0 12px 34px rgba(20,47,67,.07); --field:#fff; --field-text:#172635;
+      --tile:#f7f9fb; --tile-hover:#fff8f0; --modal-backdrop:rgba(7,19,29,.58);
+    }
+    :root[data-theme="dark"] {
+      color-scheme:dark;
+      --page:#0d151d; --surface:#17232e; --surface-soft:#202f3b; --text:#e8eef3;
+      --muted:#a2b0bb; --line:#30414e; --brand:#e8eef3; --brand-strong:#fff;
+      --accent:#ff9b36; --accent-soft:#3b2b1c; --hero-start:#172c3b; --hero-end:#24465a;
+      --shadow:0 14px 38px rgba(0,0,0,.22); --field:#111c25; --field-text:#e8eef3;
+      --tile:#1b2935; --tile-hover:#263440; --modal-backdrop:rgba(0,0,0,.72);
+    }
+    @media(prefers-color-scheme:dark) {
+      :root[data-theme="auto"] {
+        color-scheme:dark;
+        --page:#0d151d; --surface:#17232e; --surface-soft:#202f3b; --text:#e8eef3;
+        --muted:#a2b0bb; --line:#30414e; --brand:#e8eef3; --brand-strong:#fff;
+        --accent:#ff9b36; --accent-soft:#3b2b1c; --hero-start:#172c3b; --hero-end:#24465a;
+        --shadow:0 14px 38px rgba(0,0,0,.22); --field:#111c25; --field-text:#e8eef3;
+        --tile:#1b2935; --tile-hover:#263440; --modal-backdrop:rgba(0,0,0,.72);
+      }
+    }
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;background:var(--page);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;transition:background .2s,color .2s}
+    .app-shell{max-width:1160px}
+    .topbar{min-height:76px}
+    .brand{display:flex;align-items:center;gap:11px;color:var(--text);font-weight:800;font-size:20px;letter-spacing:-.6px;text-decoration:none}
+    .brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--accent);color:#172635;font-size:21px}
+    .status{font-size:12px;color:var(--muted)}
+    .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#27b27b;margin-right:7px}
+    .theme-control{position:relative}
+    .theme-trigger{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;padding:9px 12px;background:var(--surface);color:var(--text);font:inherit;font-size:13px;font-weight:650;box-shadow:0 2px 8px rgba(0,0,0,.025)}
+    .theme-trigger:hover{border-color:var(--accent)}
+    .theme-trigger .chevron{font-size:11px;color:var(--muted);margin-left:2px}
+    .theme-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:20;width:220px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);display:none}
+    .theme-menu.open{display:block}
+    .theme-option{display:flex;width:100%;align-items:center;gap:11px;padding:10px;border:0;border-radius:10px;background:transparent;color:var(--text);text-align:left;font:inherit;font-size:13px}
+    .theme-option:hover{background:var(--surface-soft)}
+    .theme-option.active{background:var(--accent-soft);font-weight:700}
+    .theme-symbol{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--surface-soft);font-size:15px}
+    .theme-check{margin-left:auto;color:var(--accent);font-weight:800}
+    .hero{position:relative;overflow:hidden;margin:30px 0 38px;padding:clamp(28px,5vw,52px);border-radius:26px;color:#fff;background:linear-gradient(115deg,var(--hero-start),var(--hero-end));box-shadow:var(--shadow)}
+    .hero:after{content:"";position:absolute;width:360px;height:360px;right:-100px;top:-210px;border:1px solid rgba(255,255,255,.12);border-radius:50%;box-shadow:0 0 0 38px rgba(255,255,255,.035),0 0 0 78px rgba(255,255,255,.025)}
+    .hero-kicker{position:relative;z-index:1;color:#ffbd7d;text-transform:uppercase;letter-spacing:1.8px;font-size:11px;font-weight:800}
+    .hero h1{position:relative;z-index:1;margin:13px 0 12px;font-size:clamp(34px,5vw,52px);line-height:1.05;letter-spacing:-2px;font-weight:800}
+    .hero p{position:relative;z-index:1;max-width:560px;margin:0;color:#d2dce4;font-size:15px}
+    .section-heading{font-weight:750;letter-spacing:-.5px;font-size:20px}
+    .search-wrap{position:relative;width:min(310px,100%)}
+    .search-wrap .search-icon{position:absolute;left:13px;top:8px;color:var(--muted);font-size:18px;pointer-events:none}
+    .form-control{border-color:var(--line);background:var(--field);color:var(--field-text);border-radius:12px;padding:10px 13px}
+    .search-wrap .form-control{padding-left:38px}
+    .form-control:focus{border-color:var(--accent);background:var(--field);color:var(--field-text);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+    .form-control::placeholder{color:var(--muted)}
+    .tool-card{height:100%;min-height:178px;width:100%;padding:21px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--text);text-align:left;box-shadow:0 3px 12px rgba(0,0,0,.025);transition:transform .18s,border-color .18s,background .18s,box-shadow .18s}
+    .tool-card:hover{transform:translateY(-4px);border-color:var(--accent);background:var(--tile-hover);box-shadow:var(--shadow)}
+    .tool-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--accent-soft);color:var(--accent);font-size:21px;font-weight:750}
+    .tool-card h3{margin:16px 0 5px;font-size:15px;font-weight:750;letter-spacing:-.2px}
+    .tool-card p{margin:0;color:var(--muted);font-size:13px}
+    .card-arrow{float:right;color:var(--muted);font-size:18px;margin-top:-26px}
+    .privacy-note{color:var(--muted);font-size:12px}
+    .footer{border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .modal-backdrop-custom{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:var(--modal-backdrop);backdrop-filter:blur(5px)}
+    .modal-backdrop-custom.open{display:flex}
+    .tool-dialog{width:min(680px,100%);max-height:90vh;overflow:auto;padding:25px;border:1px solid var(--line);border-radius:21px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px rgba(0,0,0,.25)}
+    .dialog-title{font-size:21px;font-weight:800;letter-spacing:-.6px}
+    .dialog-hint{color:var(--muted);font-size:13px}
+    .tool-input{min-height:155px;margin:10px 0 14px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+    .action-btn{border:0;border-radius:10px;padding:10px 15px;background:var(--brand);color:var(--page);font-weight:650;font-size:13px}
+    .action-btn.primary{background:var(--accent);color:#172635}
+    .action-btn.subtle{background:var(--surface-soft);color:var(--text)}
+    .result{min-height:44px;margin-top:14px;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft);color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+    .hidden{display:none!important}
+    @media(max-width:600px){.topbar{align-items:flex-start!important}.status{display:none}.hero{margin-top:18px}.search-wrap{width:100%}.tool-card{min-height:160px;padding:17px}.footer{align-items:flex-start!important;gap:6px}}
+  </style>
+</head>
+<body>
+  <main class="container app-shell px-3 px-md-4 pb-5">
+    <header class="topbar d-flex justify-content-between align-items-center">
+      <a class="brand" href="#" aria-label="MyTools Startseite"><span class="brand-mark">⌘</span><span>MyTools</span></a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="status"><span class="status-dot"></span>Alles lokal im Browser</span>
+        <div class="theme-control">
+          <button class="theme-trigger" id="themeTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+            <span id="themeCurrentIcon">◐</span><span id="themeCurrentLabel">Automatisch</span><span class="chevron">▾</span>
+          </button>
+          <div class="theme-menu" id="themeMenu" role="menu" aria-label="Darstellung auswählen">
+            <button class="theme-option" type="button" data-theme-choice="auto" role="menuitem"><span class="theme-symbol">◐</span><span>Automatisch<small class="d-block" style="color:var(--muted)">Wie im Browser</small></span><span class="theme-check"></span></button>
+            <button class="theme-option" type="button" data-theme-choice="light" role="menuitem"><span class="theme-symbol">☀</span><span>Light<small class="d-block" style="color:var(--muted)">Helles Design</small></span><span class="theme-check"></span></button>
+            <button class="theme-option" type="button" data-theme-choice="dark" role="menuitem"><span class="theme-symbol">☾</span><span>Dark<small class="d-block" style="color:var(--muted)">Dunkles Design</small></span><span class="theme-check"></span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-kicker">Dein digitaler Werkzeugkasten</div>
+      <h1>Weniger suchen.<br>Mehr erledigen.</h1>
+      <p>Praktische kleine Helfer für den Alltag – übersichtlich an einem Ort und direkt im Browser nutzbar.</p>
+    </section>
+
+    <section class="mb-3">
+      <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+        <h2 class="section-heading mb-0">Alle Werkzeuge</h2>
+        <div class="search-wrap"><span class="search-icon">⌕</span><input class="form-control" id="search" type="search" placeholder="Tool suchen …" aria-label="Tools suchen"></div>
+      </div>
+      <div class="row g-3" id="toolGrid">
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="calc"><span class="tool-icon">＋</span><span class="card-arrow">↗</span><h3>Rechner</h3><p>Einfache Berechnungen durchführen</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="json"><span class="tool-icon">{ }</span><span class="card-arrow">↗</span><h3>JSON Formatter</h3><p>JSON formatieren und validieren</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="text"><span class="tool-icon">Aa</span><span class="card-arrow">↗</span><h3>Text Converter</h3><p>Groß-/Kleinschreibung umwandeln</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="base64"><span class="tool-icon">⇄</span><span class="card-arrow">↗</span><h3>Base64</h3><p>Text codieren und decodieren</p></button></div>
+      </div>
+      <p class="privacy-note mt-4 mb-0">Deine Eingaben bleiben auf deinem Gerät. Es werden keine Daten an einen Server übertragen.</p>
+    </section>
+
+    <footer class="footer d-flex justify-content-between mt-5 pt-3"><span>MyTools · Persönliche Toolbox</span><span>Version 1.1</span></footer>
+  </main>
+
+  <div class="modal-backdrop-custom" id="modal" role="dialog" aria-modal="true" aria-labelledby="heading">
+    <section class="tool-dialog">
+      <div class="d-flex justify-content-between align-items-center gap-3 mb-3"><h2 class="dialog-title mb-0" id="heading">Tool</h2><button class="action-btn subtle" id="close" type="button">Schließen ✕</button></div>
+      <p class="dialog-hint mb-2" id="hint"></p>
+      <textarea class="form-control tool-input" id="input" placeholder="Eingabe …"></textarea>
+      <div class="d-flex flex-wrap gap-2" id="actions"></div>
+      <div class="result" id="result" aria-live="polite">Ergebnis erscheint hier.</div>
+    </section>
+  </div>
+
+  <script>
+    const $=s=>document.querySelector(s);
+    const modal=$('#modal'),input=$('#input'),result=$('#result'),actions=$('#actions');
+    const themeTrigger=$('#themeTrigger'),themeMenu=$('#themeMenu'),themeOptions=[...document.querySelectorAll('[data-theme-choice]')];
+    const systemTheme=window.matchMedia('(prefers-color-scheme: dark)');
+    const themeLabels={auto:['◐','Automatisch'],light:['☀','Light'],dark:['☾','Dark']};
+    function applyTheme(mode){
+      document.documentElement.setAttribute('data-theme',mode);
+      const [symbol,label]=themeLabels[mode];
+      $('#themeCurrentIcon').textContent=symbol;$('#themeCurrentLabel').textContent=label;
+      themeOptions.forEach(option=>{const active=option.dataset.themeChoice===mode;option.classList.toggle('active',active);option.querySelector('.theme-check').textContent=active?'✓':''});
+      const dark=mode==='dark'||(mode==='auto'&&systemTheme.matches);
+      document.querySelector('meta[name="theme-color"]').content=dark?'#0d151d':'#f5f7fa';
+    }
+    let selectedTheme='auto';
+    try{const stored=localStorage.getItem('mytools-theme');if(['auto','light','dark'].includes(stored))selectedTheme=stored}catch{}
+    applyTheme(selectedTheme);
+    themeTrigger.addEventListener('click',()=>{const open=!themeMenu.classList.contains('open');themeMenu.classList.toggle('open',open);themeTrigger.setAttribute('aria-expanded',String(open))});
+    themeOptions.forEach(option=>option.addEventListener('click',()=>{selectedTheme=option.dataset.themeChoice;try{localStorage.setItem('mytools-theme',selectedTheme)}catch{}applyTheme(selectedTheme);themeMenu.classList.remove('open');themeTrigger.setAttribute('aria-expanded','false')}));
+    document.addEventListener('click',e=>{if(!e.target.closest('.theme-control')){themeMenu.classList.remove('open');themeTrigger.setAttribute('aria-expanded','false')}});
+    systemTheme.addEventListener('change',()=>{if(selectedTheme==='auto')applyTheme('auto')});
+
+    const tools={
+      calc:{name:'Rechner',hint:'Unterstützt +, -, *, /, Prozent und Klammern.',buttons:[['Berechnen',()=>{try{const s=input.value.trim();if(!s||!/^[0-9+\\-*/().,%\\s]+$/.test(s))throw 0;const n=Function('"use strict";return ('+s.replace(/%/g,'/100')+')')();if(!Number.isFinite(n))throw 0;result.textContent=new Intl.NumberFormat('de-DE').format(n)}catch{result.textContent='Ungültiger Ausdruck.'}}]]},
+      json:{name:'JSON Formatter',hint:'JSON einfügen, formatieren oder minifizieren.',buttons:[['Formatieren',()=>convert(v=>JSON.stringify(JSON.parse(v),null,2))],['Minifizieren',()=>convert(v=>JSON.stringify(JSON.parse(v)))],['Kopieren',()=>copyResult()]]},
+      text:{name:'Text Converter',hint:'Text umwandeln.',buttons:[['GROSS',()=>result.textContent=input.value.toLocaleUpperCase('de-DE')],['klein',()=>result.textContent=input.value.toLocaleLowerCase('de-DE')],['Title Case',()=>result.textContent=input.value.toLocaleLowerCase('de-DE').replace(/\\b\\p{L}/gu,c=>c.toLocaleUpperCase('de-DE'))],['Trim',()=>result.textContent=input.value.split('\\n').map(x=>x.trim()).join('\\n').trim()]]},
+      base64:{name:'Base64',hint:'UTF-8-Text codieren oder decodieren.',buttons:[['Codieren',()=>{result.textContent=btoa(unescape(encodeURIComponent(input.value)))}],['Decodieren',()=>{try{result.textContent=decodeURIComponent(escape(atob(input.value.trim())))}catch{result.textContent='Ungültiger Base64-Text.'}}]]}
+    };
+    function convert(fn){try{result.textContent=fn(input.value)}catch(e){result.textContent='Fehler: '+e.message}}
+    function copyResult(){navigator.clipboard.writeText(result.textContent).then(()=>{const old=result.textContent;result.textContent='In Zwischenablage kopiert ✓';setTimeout(()=>result.textContent=old,1200)}).catch(()=>{result.textContent='Kopieren nicht möglich.'})}
+    document.querySelectorAll('[data-tool]').forEach(button=>button.addEventListener('click',()=>{
+      const tool=tools[button.dataset.tool];$('#heading').textContent=tool.name;$('#hint').textContent=tool.hint;input.value='';result.textContent='Ergebnis erscheint hier.';actions.innerHTML='';
+      tool.buttons.forEach(([label,fn],index)=>{const b=document.createElement('button');b.type='button';b.className='action-btn '+(index===0?'primary':'subtle');b.textContent=label;b.addEventListener('click',fn);actions.append(b)});
+      modal.classList.add('open');input.focus();
+    }));
+    $('#close').addEventListener('click',()=>modal.classList.remove('open'));
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){modal.classList.remove('open');themeMenu.classList.remove('open')}});
+    $('#search').addEventListener('input',e=>{const q=e.target.value.toLocaleLowerCase('de-DE');document.querySelectorAll('[data-tool]').forEach(button=>button.closest('.col-6').classList.toggle('hidden',!button.innerText.toLocaleLowerCase('de-DE').includes(q)))});
+  </script>
+</body>
+</html>
