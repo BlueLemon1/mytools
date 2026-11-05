@@ -34,7 +34,7 @@ export function buildPowerAutomateExpression(name, args = '') {
     if (!['utcNow', 'triggerBody', 'item'].includes(name) && !args.trim()) {
         throw new Error('expressionArgumentsRequired');
     }
-    return '@' + builder(args.trim());
+    return builder(args.trim());
 }
 
 export const powerAutomateExpressions = Object.keys(EXPRESSIONS);
