@@ -21,6 +21,8 @@ import { testRegex } from './regex.js';
 import { convertDateTime } from './datetime.js';
 import { parseUrl } from './url.js';
 import { formatXml, minifyXml } from './xml.js';
+import { buildPowerAutomateExpression } from './power-automate.js';
+import { generatePowerShellSnippet } from './powershell-snippets.js';
 
 function createCalculatorTool() {
     return {
@@ -285,6 +287,39 @@ function createDateTimeTool() {
     };
 }
 
+
+function createPowerAutomateTool() {
+    return {
+        id: 'power-automate', category: 'dev', nameKey: 'powerAutomate',
+        descriptionKey: 'powerAutomateDesc', hintKey: 'powerAutomateHint',
+        placeholderKey: 'powerAutomatePlaceholder',
+        keywords: ['power automate', 'expression', 'workflow', 'flow', 'coalesce', 'triggerbody', 'body', 'outputs'],
+        actions: [{
+            id: 'build', labelKey: 'buildExpression', primary: true,
+            run: (value, language, translate, options) => buildPowerAutomateExpression(
+                options.expressionName,
+                options.expressionArguments || value,
+            ),
+        }],
+    };
+}
+
+function createPowerShellTool() {
+    return {
+        id: 'powershell', category: 'dev', nameKey: 'powershell',
+        descriptionKey: 'powershellDesc', hintKey: 'powershellHint',
+        placeholderKey: 'powershellPlaceholder',
+        keywords: ['powershell', 'powershell 5.1', 'active directory', 'exchange online', 'microsoft graph', 'rest api', 'csv', 'json'],
+        actions: [{
+            id: 'generate', labelKey: 'generateCode', primary: true,
+            run: (value, language, translate, options) => generatePowerShellSnippet(
+                options.powershellSnippet,
+                { uri: options.powershellUri, tokenVariable: options.powershellToken },
+            ),
+        }],
+    };
+}
+
 /** The central registry used to render, search, and open available tools. */
 export const tools = [
     createCalculatorTool(),
@@ -298,6 +333,8 @@ export const tools = [
     createXmlTool(),
     createUrlTool(),
     createDateTimeTool(),
+    createPowerAutomateTool(),
+    createPowerShellTool(),
 ];
 
 export function getTool(id) {
