@@ -592,6 +592,14 @@ function updatePreferenceMenus() {
     $('#languageLabel').textContent = language.toUpperCase();
     $('#themeLabel').textContent = THEME_LABELS[language][theme];
 
+    const themeIcon = $('#themeIcon');
+    const themeIcons = {
+        auto: '<circle cx="12" cy="12" r="8"></circle><path d="M12 4v16M12 4a8 8 0 0 1 0 16"></path>',
+        light: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>',
+        dark: '<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path>',
+    };
+    themeIcon.innerHTML = themeIcons[theme];
+
     document.querySelectorAll('[data-menu="language"] [data-value]').forEach((button) => {
         updateMenuItem(button, button.dataset.value === language);
     });
