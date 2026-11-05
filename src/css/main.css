@@ -170,10 +170,13 @@ button {
 
 .preference-trigger {
     display: inline-flex;
+    width: 42px;
+    height: 42px;
     min-height: 42px;
     align-items: center;
-    gap: 9px;
-    padding: 4px 11px 4px 5px;
+    justify-content: center;
+    gap: 0;
+    padding: 4px;
     border: 1px solid var(--border);
     border-radius: 14px;
     background: var(--surface);
@@ -917,9 +920,10 @@ button {
     }
 
     .preference-trigger {
+        width: 38px;
+        height: 38px;
         min-height: 38px;
-        gap: 6px;
-        padding-inline: 5px 8px;
+        padding: 3px;
     }
 
     .pref-trigger-icon {
@@ -1007,8 +1011,10 @@ button {
     }
 
     .preference-trigger {
-        gap: 5px;
-        padding-inline: 4px 6px;
+        width: 36px;
+        height: 36px;
+        min-height: 36px;
+        padding: 2px;
     }
 
     .pref-trigger-label {
