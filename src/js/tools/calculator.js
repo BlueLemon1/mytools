@@ -1,2 +1,148 @@
-const tokenize=s=>{const text=String(s).replace(/\s+/g,'').replace(',','.');if(!text)throw Error('empty');const out=[],re=/\d+(?:\.\d+)?|\*\*|[()+\-*/%^]/gy;let p=0;while(p<text.length){re.lastIndex=p;const m=re.exec(text);if(!m)throw Error('syntax');out.push(m[0]);p=re.lastIndex}return out};
-export function calculate(source){const a=tokenize(source);let i=0;const peek=()=>a[i],take=()=>a[i++];function primary(){if(peek()==='+'||peek()==='-'){const sign=take(),n=primary();return sign==='-'?-n:n}if(peek()==='('){take();const n=expr();if(take()!==')')throw Error('syntax');return n}const t=take();if(t===undefined||!/^\d+(?:\.\d+)?$/.test(t))throw Error('syntax');return Number(t)}function power(){const n=primary();if(peek()==='**'||peek()==='^'){take();return Math.pow(n,unary())}return n}function unary(){let n=power();while(peek()==='%'){take();n/=100}return n}function term(){let n=unary();while(['*','/','%'].includes(peek())){const op=take(),r=unary();if((op==='/'||op==='%')&&r===0)throw Error('zero');n=op==='*'?n*r:op==='/'?n/r:n%r}return n}function expr(){let n=term();while(peek()==='+'||peek()==='-'){const op=take(),r=term();n=op==='+'?n+r:n-r}return n}const n=expr();if(i!==a.length||!Number.isFinite(n))throw Error('syntax');return n}
+/**
+ * Tokenizes a mathematical expression.
+ * Supported operators: +, -, *, /, %, ^, ** and parentheses.
+ */
+function tokenize(source) {
+    const expression = String(source).replace(/\s+/g, '').replace(',', '.');
+
+    if (!expression) {
+        throw new Error('empty');
+    }
+
+    const tokenPattern = /\d+(?:\.\d+)?|\*\*|[()+\-*/%^]/gy;
+    const tokens = [];
+    let position = 0;
+
+    while (position < expression.length) {
+        tokenPattern.lastIndex = position;
+
+        const match = tokenPattern.exec(expression);
+
+        if (!match) {
+            throw new Error('syntax');
+        }
+
+        tokens.push(match[0]);
+        position = tokenPattern.lastIndex;
+    }
+
+    return tokens;
+}
+
+/**
+ * Evaluates a mathematical expression without using eval or Function.
+ * The parser implements operator precedence and right-associative powers.
+ */
+export function calculate(source) {
+    const tokens = tokenize(source);
+    let position = 0;
+
+    const peek = () => tokens[position];
+    const consume = () => tokens[position++];
+
+    function parsePrimary() {
+        if (peek() === '+' || peek() === '-') {
+            const sign = consume();
+            const value = parsePrimary();
+
+            return sign === '-' ? -value : value;
+        }
+
+        if (peek() === '(') {
+            consume();
+
+            const value = parseExpression();
+
+            if (consume() !== ')') {
+                throw new Error('syntax');
+            }
+
+            return value;
+        }
+
+        const token = consume();
+
+        if (token === undefined || !/^\d+(?:\.\d+)?$/.test(token)) {
+            throw new Error('syntax');
+        }
+
+        return Number(token);
+    }
+
+    function parsePower() {
+        const base = parsePrimary();
+
+        if (peek() === '**' || peek() === '^') {
+            consume();
+            return Math.pow(base, parseUnary());
+        }
+
+        return base;
+    }
+
+    function parseUnary() {
+        let value = parsePower();
+
+        while (peek() === '%') {
+            consume();
+            value /= 100;
+        }
+
+        return value;
+    }
+
+    function parseTerm() {
+        let value = parseUnary();
+
+        while (['*', '/', '%'].includes(peek())) {
+            const operator = consume();
+            const rightOperand = parseUnary();
+
+            if (
+                (operator === '/' || operator === '%') &&
+                rightOperand === 0
+            ) {
+                throw new Error('zero');
+            }
+
+            switch (operator) {
+                case '*':
+                    value *= rightOperand;
+                    break;
+                case '/':
+                    value /= rightOperand;
+                    break;
+                case '%':
+                    value %= rightOperand;
+                    break;
+                default:
+                    throw new Error('syntax');
+            }
+        }
+
+        return value;
+    }
+
+    function parseExpression() {
+        let value = parseTerm();
+
+        while (peek() === '+' || peek() === '-') {
+            const operator = consume();
+            const rightOperand = parseTerm();
+
+            value = operator === '+'
+                ? value + rightOperand
+                : value - rightOperand;
+        }
+
+        return value;
+    }
+
+    const result = parseExpression();
+
+    if (position !== tokens.length || !Number.isFinite(result)) {
+        throw new Error('syntax');
+    }
+
+    return result;
+}
