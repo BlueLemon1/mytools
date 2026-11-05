@@ -43,8 +43,8 @@ export function mountApp(root) {
     setLanguage(readStorage('language', 'de'));
 
     const state = {
-        favorites: readStorage('favorites', []),
-        recent: readStorage('recent', []),
+        favorites: readStringList('favorites'),
+        recent: readStringList('recent'),
         category: 'all',
         activeTool: null,
         returnFocus: null,
@@ -74,6 +74,15 @@ export function mountApp(root) {
 
     handleToolHash(elements, state);
     window.addEventListener('hashchange', () => handleToolHash(elements, state));
+}
+
+/** Reads a stored list and ignores invalid values or non-string entries. */
+function readStringList(key) {
+    const value = readStorage(key, []);
+
+    return Array.isArray(value)
+        ? value.filter((item) => typeof item === 'string')
+        : [];
 }
 
 /** Creates the static application shell. Dynamic tool content is rendered separately. */
@@ -468,6 +477,9 @@ function renderToolCollections(elements, state) {
 
     elements.grid.innerHTML = visibleTools.map((tool) => renderToolCard(tool, state)).join('');
     elements.empty.hidden = visibleTools.length > 0;
+    elements.empty.textContent = state.category === 'favorites'
+        ? t('emptyFavorites')
+        : t('noResults');
 
     renderRecentTools(elements.recent, state);
 }
