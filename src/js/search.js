@@ -1,2 +1,63 @@
-export function filterTools(tools,query,category='all',favorites=[]){const needle=query.trim().toLocaleLowerCase();return tools.filter(tool=>{const categoryMatch=category==='all'||(category==='favorites'?favorites.includes(tool.id):tool.category===category);const text=[tool.nameKey,tool.descriptionKey,...tool.keywords].join(' ').toLocaleLowerCase();return categoryMatch&&(!needle||text.includes(needle))})}
-export function installSearchShortcut(input){document.addEventListener('keydown',e=>{const target=e.target;const typing=target instanceof HTMLElement&&(target.isContentEditable||['INPUT','TEXTAREA','SELECT'].includes(target.tagName));if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();input.focus();input.select()}else if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();input.focus()}})}
+/**
+ * Filters tools by search query, category, and favorite state.
+ */
+export function filterTools(tools, query, category = 'all', favorites = []) {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+
+    return tools.filter((tool) => {
+        const matchesCategory =
+            category === 'all' ||
+            (category === 'favorites'
+                ? favorites.includes(tool.id)
+                : tool.category === category);
+
+        if (!matchesCategory) {
+            return false;
+        }
+
+        if (!normalizedQuery) {
+            return true;
+        }
+
+        const searchableText = [
+            tool.nameKey,
+            tool.descriptionKey,
+            ...tool.keywords,
+        ]
+            .join(' ')
+            .toLocaleLowerCase();
+
+        return searchableText.includes(normalizedQuery);
+    });
+}
+
+/**
+ * Adds keyboard shortcuts for focusing the tool search field.
+ */
+export function installSearchShortcut(input) {
+    document.addEventListener('keydown', (event) => {
+        const target = event.target;
+        const isTyping =
+            target instanceof HTMLElement &&
+            (target.isContentEditable ||
+                ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+            event.preventDefault();
+            input.focus();
+            input.select();
+            return;
+        }
+
+        if (
+            event.key === '/' &&
+            !isTyping &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.altKey
+        ) {
+            event.preventDefault();
+            input.focus();
+        }
+    });
+}
