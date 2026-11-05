@@ -108,12 +108,7 @@ function renderApplication(root) {
                             aria-expanded="false"
                             aria-label="Language"
                         >
-                            <span class="pref-trigger-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path>
-                                </svg>
-                            </span>
+                            <span class="pref-trigger-icon language-flag" id="languageIcon" aria-hidden="true">🇩🇪</span>
                             <span class="pref-trigger-label" id="languageLabel">DE</span>
                             <svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true">
                                 <path d="m5 7 5 5 5-5"></path>
@@ -122,12 +117,12 @@ function renderApplication(root) {
 
                         <div class="preference-menu" role="menu" hidden>
                             <button type="button" role="menuitemradio" data-value="de">
-                                <span class="menu-flag">DE</span>
+                                <span class="menu-flag" aria-hidden="true">🇩🇪</span>
                                 <span>Deutsch</span>
                                 <span class="menu-check" aria-hidden="true">✓</span>
                             </button>
                             <button type="button" role="menuitemradio" data-value="en">
-                                <span class="menu-flag">EN</span>
+                                <span class="menu-flag" aria-hidden="true">🇬🇧</span>
                                 <span>English</span>
                                 <span class="menu-check" aria-hidden="true">✓</span>
                             </button>
@@ -155,17 +150,17 @@ function renderApplication(root) {
 
                         <div class="preference-menu" role="menu" hidden>
                             <button type="button" role="menuitemradio" data-value="auto">
-                                <span class="menu-choice-icon" aria-hidden="true">◐</span>
+                                <span class="menu-choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path></svg></span>
                                 <span data-i18n="auto"></span>
                                 <span class="menu-check" aria-hidden="true">✓</span>
                             </button>
                             <button type="button" role="menuitemradio" data-value="light">
-                                <span class="menu-choice-icon" aria-hidden="true">☼</span>
+                                <span class="menu-choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span>
                                 <span data-i18n="light"></span>
                                 <span class="menu-check" aria-hidden="true">✓</span>
                             </button>
                             <button type="button" role="menuitemradio" data-value="dark">
-                                <span class="menu-choice-icon" aria-hidden="true">☾</span>
+                                <span class="menu-choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path></svg></span>
                                 <span data-i18n="dark"></span>
                                 <span class="menu-check" aria-hidden="true">✓</span>
                             </button>
@@ -590,6 +585,7 @@ function updatePreferenceMenus() {
     const theme = getTheme();
 
     $('#languageLabel').textContent = language.toUpperCase();
+    $('#languageIcon').textContent = language === 'de' ? '🇩🇪' : '🇬🇧';
     $('#themeLabel').textContent = THEME_LABELS[language][theme];
 
     const themeIcon = $('#themeIcon');
