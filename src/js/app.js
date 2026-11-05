@@ -482,7 +482,7 @@ function getToolErrorMessage(error) {
         zero: 'calcZero',
         empty: 'calcEmpty',
         syntax: 'calcInvalid',
-        invalidJson: 'invalidJson',
+        invalidJson: 'invalidJson',\n        invalidJwt: 'invalidJwt',\n        invalidXml: 'invalidXml',\n        invalidUrl: 'invalidUrl',\n        invalidDate: 'invalidDate',\n        regexPatternRequired: 'regexPatternRequired',
     };
 
     return errorMessages[error.message]
@@ -610,7 +610,7 @@ function localizeInterface(elements, state) {
         $('#toolTitle').textContent = t(state.activeTool.nameKey);
         $('#hint').textContent = t(state.activeTool.hintKey);
         elements.input.placeholder = t(state.activeTool.placeholderKey);
-        renderToolOptions(elements.options, state.activeTool);\n        renderToolOptions(elements.options, state.activeTool);\n        renderToolOptions(elements.options, state.activeTool);
+        renderToolOptions(elements.options, state.activeTool);
         renderToolActions(elements.actions, state.activeTool);
         updateFavoriteButton(elements.favorite, state);
     }
@@ -620,41 +620,6 @@ function localizeInterface(elements, state) {
 }
 
 /** Updates the labels and selected state of both preference menus. */
-function updatePreferenceMenus() {
-    const language = getLanguage();
-    const theme = getTheme();
-
-    $('#languageLabel').textContent = language.toUpperCase();
-    $('#languageIcon').textContent = language === 'de' ? '🇩🇪' : '🇬🇧';
-    $('#themeLabel').textContent = THEME_LABELS[language][theme];
-
-    const themeIcon = $('#themeIcon');
-    const themeIcons = {
-        auto: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path></svg>',
-        light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>',
-        dark: '<svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path></svg>',
-    };
-    themeIcon.innerHTML = themeIcons[theme];
-    const themeLabel = THEME_LABELS[language][theme];
-    $('#languageLabel').textContent = language === 'de' ? 'Deutsch' : 'English';
-    $('#themeLabel').textContent = themeLabel;
-    $('[data-menu="language"] .preference-trigger').setAttribute('aria-label', language === 'de' ? 'Sprache: ' + $('#languageLabel').textContent : 'Language: ' + $('#languageLabel').textContent);
-    $('[data-menu="theme"] .preference-trigger').setAttribute('aria-label', (language === 'de' ? 'Darstellung: ' : 'Appearance: ') + themeLabel);
-
-    document.querySelectorAll('[data-menu="language"] [data-value]').forEach((button) => {
-        updateMenuItem(button, button.dataset.value === language);
-    });
-
-    document.querySelectorAll('[data-menu="theme"] [data-value]').forEach((button) => {
-        updateMenuItem(button, button.dataset.value === theme);
-    });
-}
-
-function updateMenuItem(button, isSelected) {
-    button.classList.toggle('selected', isSelected);
-    button.setAttribute('aria-checked', String(isSelected));
-}
-
 /** Connects language and theme popovers, including keyboard navigation. */
 function bindPreferenceMenus(elements, state) {
     document.querySelectorAll('.preference-wrap').forEach((wrapper) => {
