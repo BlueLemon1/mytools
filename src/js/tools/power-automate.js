@@ -1,4 +1,5 @@
 const EXPRESSIONS = {
+    custom: (args) => args,
     coalesce: (args) => 'coalesce(' + args + ')',
     if: (args) => 'if(' + args + ')',
     equals: (args) => 'equals(' + args + ')',
