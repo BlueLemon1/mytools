@@ -378,7 +378,7 @@ function openTool(toolId, trigger, elements, state) {
     elements.result.textContent = t('emptyResult');
 
     updateFavoriteButton(elements.favorite, state);
-    renderToolOptions(elements.options, tool);\n    renderToolActions(elements.actions, tool);
+    renderToolOptions(elements.options, tool);\n    renderToolOptions(elements.options, tool);\n    renderToolActions(elements.actions, tool);
     elements.dialog.showModal();
     elements.input.focus();
 
@@ -608,7 +608,7 @@ function localizeInterface(elements, state) {
         $('#toolTitle').textContent = t(state.activeTool.nameKey);
         $('#hint').textContent = t(state.activeTool.hintKey);
         elements.input.placeholder = t(state.activeTool.placeholderKey);
-        renderToolOptions(elements.options, state.activeTool);\n        renderToolActions(elements.actions, state.activeTool);
+        renderToolOptions(elements.options, state.activeTool);\n        renderToolOptions(elements.options, state.activeTool);\n        renderToolActions(elements.actions, state.activeTool);
         updateFavoriteButton(elements.favorite, state);
     }
 
