@@ -170,12 +170,12 @@ button {
 
 .preference-trigger {
     display: inline-flex;
-    min-height: 39px;
+    min-height: 42px;
     align-items: center;
     gap: 9px;
-    padding: 0 12px;
+    padding: 4px 11px 4px 5px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     background: var(--surface);
     color: var(--text);
     font-size: 12px;
@@ -185,8 +185,8 @@ button {
 
 .preference-trigger:hover,
 .preference-trigger[aria-expanded="true"] {
-    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-    background: var(--surface-soft);
+    border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+    background: var(--surface);
 }
 
 .preference-trigger[aria-expanded="true"] {
@@ -195,19 +195,21 @@ button {
 
 .pref-trigger-icon {
     display: grid;
-    width: 25px;
-    height: 25px;
+    width: 31px;
+    height: 31px;
     flex: none;
     place-items: center;
-    border-radius: 8px;
-    background: var(--accent-soft);
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
     color: var(--accent-strong);
 }
 
 .pref-trigger-icon svg,
-.pref-chevron {
-    width: 15px;
-    height: 15px;
+.pref-chevron,
+.menu-choice-icon svg {
+    width: 17px;
+    height: 17px;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;
@@ -215,9 +217,16 @@ button {
     stroke-width: 1.8;
 }
 
+.pref-trigger-icon.language-flag {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+    font-size: 21px;
+    line-height: 1;
+}
+
 .pref-chevron {
     width: 12px;
     height: 12px;
+    margin-left: 1px;
     color: var(--muted);
     transition: transform 160ms ease;
 }
@@ -234,9 +243,9 @@ button {
 .preference-menu {
     position: absolute;
     z-index: 20;
-    top: calc(100% + 8px);
+    top: calc(100% + 9px);
     right: 0;
-    min-width: 184px;
+    min-width: 194px;
     padding: 6px;
     border: 1px solid var(--border);
     border-radius: 15px;
@@ -253,10 +262,10 @@ button {
 .preference-menu button {
     display: flex;
     width: 100%;
-    min-height: 39px;
+    min-height: 42px;
     align-items: center;
-    gap: 10px;
-    padding: 7px 9px;
+    gap: 11px;
+    padding: 6px 9px;
     border: 0;
     border-radius: 10px;
     background: transparent;
@@ -279,20 +288,20 @@ button {
 .menu-flag,
 .menu-choice-icon {
     display: grid;
-    width: 27px;
-    height: 27px;
+    width: 28px;
+    height: 28px;
     flex: none;
     place-items: center;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface-soft);
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
     color: var(--muted);
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 19px;
+    line-height: 1;
 }
 
 .menu-choice-icon {
-    font-size: 15px;
+    color: var(--accent-strong);
 }
 
 .menu-check {
@@ -908,9 +917,14 @@ button {
     }
 
     .preference-trigger {
-        min-height: 35px;
+        min-height: 38px;
         gap: 6px;
-        padding-inline: 8px;
+        padding-inline: 5px 8px;
+    }
+
+    .pref-trigger-icon {
+        width: 28px;
+        height: 28px;
     }
 
     .pref-trigger-label {
@@ -994,7 +1008,7 @@ button {
 
     .preference-trigger {
         gap: 5px;
-        padding-inline: 6px;
+        padding-inline: 4px 6px;
     }
 
     .pref-trigger-label {
