@@ -33,6 +33,8 @@ const TOOL_ICONS = {
     xml: '</>',
     url: '↗',
     datetime: '◷',
+    'power-automate': 'fx',
+    powershell: 'PS',
 };
 
 const THEME_LABELS = {
@@ -434,6 +436,38 @@ function renderToolOptions(container, tool) {
             <label class="field-label" for="compareInput">${t('compareInput')}</label>
             <textarea id="compareInput" class="tool-input" placeholder='{"example":true}'></textarea>
         `,
+        'power-automate': `
+            <label class="field-label" for="expressionName">${t('expressionFunction')}</label>
+            <select id="expressionName" class="tool-option-input">
+                <option value="coalesce">coalesce()</option><option value="if">if()</option><option value="equals">equals()</option>
+                <option value="contains">contains()</option><option value="startsWith">startsWith()</option><option value="endsWith">endsWith()</option>
+                <option value="length">length()</option><option value="first">first()</option><option value="last">last()</option>
+                <option value="join">join()</option><option value="concat">concat()</option><option value="formatDateTime">formatDateTime()</option>
+                <option value="convertTimeZone">convertTimeZone()</option><option value="addDays">addDays()</option><option value="addHours">addHours()</option>
+                <option value="utcNow">utcNow()</option><option value="int">int()</option><option value="string">string()</option>
+                <option value="json">json()</option><option value="uriComponent">uriComponent()</option><option value="body">body('ActionName')</option>
+                <option value="outputs">outputs('ActionName')</option><option value="triggerBody">triggerBody()</option><option value="item">item()</option>
+                <option value="items">items('Apply_to_each')</option><option value="variables">variables('VariableName')</option><option value="parameters">parameters('ParameterName')</option>
+            </select>
+            <label class="field-label" for="expressionArguments">${t('expressionArguments')}</label>
+            <input id="expressionArguments" class="tool-option-input" type="text" placeholder="body('Get_item')?['Title']">
+            <p class="tool-option-hint">${t('expressionHint')}</p>
+        `,
+        powershell: `
+            <label class="field-label" for="powershellSnippet">${t('powershellSnippet')}</label>
+            <select id="powershellSnippet" class="tool-option-input">
+                <option value="rest">${t('psRest')}</option><option value="post">${t('psPost')}</option>
+                <option value="ad">${t('psAd')}</option><option value="csv">${t('psCsv')}</option>
+                <option value="json">${t('psJson')}</option><option value="trycatch">${t('psTryCatch')}</option>
+                <option value="logging">${t('psLogging')}</option><option value="graph">${t('psGraph')}</option>
+                <option value="exchange">${t('psExchange')}</option>
+            </select>
+            <label class="field-label" for="powershellUri">${t('psUri')}</label>
+            <input id="powershellUri" class="tool-option-input" type="text" value="https://api.example.com/v1/items">
+            <label class="field-label" for="powershellToken">${t('psToken')}</label>
+            <input id="powershellToken" class="tool-option-input" type="text" value="$accessToken">
+            <p class="tool-option-hint">${t('psHint')}</p>
+        `,
         regex: `
             <label class="field-label" for="regexPattern">${t('regexPattern')}</label>
             <input id="regexPattern" class="tool-option-input" type="text" placeholder="\\\\d+">
@@ -453,6 +487,11 @@ function getToolOptions(container) {
         compareInput: $('#compareInput', container)?.value ?? '',
         pattern: $('#regexPattern', container)?.value ?? '',
         flags: $('#regexFlags', container)?.value ?? 'gm',
+        expressionName: $('#expressionName', container)?.value ?? 'coalesce',
+        expressionArguments: $('#expressionArguments', container)?.value ?? '',
+        powershellSnippet: $('#powershellSnippet', container)?.value ?? 'rest',
+        powershellUri: $('#powershellUri', container)?.value ?? '',
+        powershellToken: $('#powershellToken', container)?.value ?? '$accessToken',
     };
 }
 
