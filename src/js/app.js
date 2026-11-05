@@ -1,23 +1,742 @@
-import{tools,getTool}from'./tools/registry.js';import{t,setLanguage,getLanguage}from'./i18n.js';import{initTheme,setTheme,getTheme}from'./theme.js';import{readStorage,writeStorage}from'./storage.js';import{filterTools,installSearchShortcut}from'./search.js';
-const $=s=>document.querySelector(s),icons={calculator:'＋',json:'{ }',text:'Aa',base64:'⇄'};
-export function mountApp(root){if(!root)return;initTheme();setLanguage(readStorage('language','de'));let fav=readStorage('favorites',[]),recent=readStorage('recent',[]),cat='all',active=null,focusBack=null;
-root.innerHTML=`<div class="app-shell container-xl px-3"><header class="topbar d-flex justify-content-between align-items-center"><a class="brand" href="./"><span class="brand-mark">⌘</span>MyTools</a><div class="header-actions"><span class="local-status">● <span data-i18n="local"></span></span><div class="preference-wrap" data-menu="language"><button class="preference-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language"><span class="pref-trigger-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path></svg></span><span class="pref-trigger-label" id="languageLabel">DE</span><svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"></path></svg></button><div class="preference-menu" role="menu" hidden><button type="button" role="menuitemradio" data-value="de"><span class="menu-flag">DE</span><span>Deutsch</span><span class="menu-check">✓</span></button><button type="button" role="menuitemradio" data-value="en"><span class="menu-flag">EN</span><span>English</span><span class="menu-check">✓</span></button></div></div><div class="preference-wrap" data-menu="theme"><button class="preference-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Appearance"><span class="pref-trigger-icon" id="themeIcon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path></svg></span><span class="pref-trigger-label" id="themeLabel"></span><svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"></path></svg></button><div class="preference-menu" role="menu" hidden><button type="button" role="menuitemradio" data-value="auto"><span class="menu-choice-icon">◐</span><span data-i18n="auto"></span><span class="menu-check">✓</span></button><button type="button" role="menuitemradio" data-value="light"><span class="menu-choice-icon">☼</span><span data-i18n="light"></span><span class="menu-check">✓</span></button><button type="button" role="menuitemradio" data-value="dark"><span class="menu-choice-icon">☾</span><span data-i18n="dark"></span><span class="menu-check">✓</span></button></div></div></div></header><section class="hero"><div class="eyebrow" data-i18n="eyebrow"></div><h1><span data-i18n="headlineA"></span><br><span class="hero-accent" data-i18n="headlineB"></span></h1><p data-i18n="intro"></p><div class="hero-meta">✦ <span data-i18n="local"></span> · ${tools.length} <span data-i18n="allTools"></span></div><div class="hero-orbit"></div></section><main><div class="section-top"><div><p class="section-kicker">WORKSPACE</p><h2 data-i18n="allTools"></h2></div><label class="search-box"><span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.2 4.2"></path></svg></span><input id="search" type="search" data-i18n-placeholder="searchPlaceholder" aria-label="Search tools"><kbd>Ctrl K</kbd></label></div><nav class="category-tabs" id="categories" aria-label="Tool categories"><button class="category-tab active" data-cat="all" data-i18n="categoryAll"></button><button class="category-tab" data-cat="text" data-i18n="categoryText"></button><button class="category-tab" data-cat="dev" data-i18n="categoryDev"></button><button class="category-tab" data-cat="utility" data-i18n="categoryUtility"></button><button class="category-tab" data-cat="favorites" data-i18n="favorites"></button></nav><div id="grid" class="tool-grid"></div><p id="empty" hidden data-i18n="noResults"></p><section class="quick-sections"><h2 data-i18n="recent"></h2><div id="recent" class="recent-grid"></div></section></main><footer class="footer"><strong>⌘ MyTools</strong><span data-i18n="privacy"></span><span>© 2026</span></footer></div><dialog id="dialog" class="tool-dialog" aria-labelledby="toolTitle"><div class="dialog-top"><div class="dialog-heading"><div id="toolIcon" class="dialog-icon"></div><div><h2 id="toolTitle"></h2><p id="hint"></p></div></div><div class="dialog-controls"><button id="fav" class="icon-button" type="button" aria-label="Favorite">☆</button><button id="close" class="icon-button" type="button" aria-label="Close">×</button></div></div><div class="dialog-body"><label class="field-label" for="input" data-i18n="input"></label><textarea id="input" class="tool-input"></textarea><div id="actions" class="action-row"></div><div class="result-heading"><label class="field-label" for="result" data-i18n="output"></label><button id="copy" class="copy-button" data-i18n="copy"></button></div><pre id="result" class="tool-result" aria-live="polite"></pre></div></dialog>`;
-const dialog=$('#dialog'),search=$('#search'),input=$('#input'),result=$('#result');
-function render(){const list=filterTools(tools,search.value,cat,fav);$('#grid').innerHTML=list.map(x=>`<button class="tool-card" data-open="${x.id}"><span class="tool-card-top"><span class="tool-icon">${icons[x.id]}</span><span>↗</span></span><b class="tool-card-title">${t(x.nameKey)}</b><span class="tool-card-description">${t(x.descriptionKey)}</span><span class="tool-card-bottom"><small>${t(x.category==='dev'?'categoryDev':x.category==='text'?'categoryText':'categoryUtility')}</small>${fav.includes(x.id)?'★':'☆'}</span></button>`).join('');$('#empty').hidden=list.length>0;$('#recent').innerHTML=recent.slice(0,3).map(id=>getTool(id)).filter(Boolean).map(x=>`<button class="recent-item" data-open="${x.id}">${icons[x.id]}　${t(x.nameKey)}</button>`).join('')||t('emptyRecent')}
-function localize(){document.querySelectorAll('[data-i18n]').forEach(x=>x.textContent=t(x.dataset.i18n));document.querySelectorAll('[data-i18n-placeholder]').forEach(x=>x.placeholder=t(x.dataset.i18nPlaceholder));$('#search').setAttribute('aria-label',t('searchLabel'));$('#close').setAttribute('aria-label',t('close'));if(active)$('#fav').setAttribute('aria-label',t(fav.includes(active.id)?'unfavorite':'favorite'));updatePreferenceMenus();render()}
-function open(id,trigger){active=getTool(id);if(!active)return;focusBack=trigger||document.activeElement;recent=[id,...recent.filter(x=>x!==id)].slice(0,5);writeStorage('recent',recent);$('#toolIcon').textContent=icons[id];$('#toolTitle').textContent=t(active.nameKey);$('#hint').textContent=t(active.hintKey);input.value='';input.placeholder=t(active.placeholderKey);result.textContent=t('emptyResult');$('#fav').textContent=fav.includes(id)?'★':'☆';$('#fav').setAttribute('aria-label',t(fav.includes(id)?'unfavorite':'favorite'));$('#actions').innerHTML=active.actions.map(a=>`<button class="action-button ${a.primary?'primary':''}" data-action="${a.id}">${t(a.labelKey)}</button>`).join('');dialog.showModal();input.focus();render()}
-$('#grid').addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b){open(b.dataset.open,b);history.replaceState(null,'','#tool='+b.dataset.open)}});
-$('#recent').addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)open(b.dataset.open,b)});
-$('#actions').addEventListener('click',e=>{const b=e.target.closest('[data-action]'),a=active?.actions.find(x=>x.id===b?.dataset.action);if(!a)return;try{result.textContent=a.run(input.value,getLanguage(),t)}catch(err){result.textContent=err.message==='zero'?t('calcZero'):err.message==='empty'?t('calcEmpty'):err.message==='syntax'?t('calcInvalid'):err.message}});
-function close(){dialog.close();active=null;if(focusBack?.focus)focusBack.focus();if(location.hash.startsWith('#tool='))history.replaceState(null,'',location.pathname)}
-$('#close').addEventListener('click',close);dialog.addEventListener('click',e=>{if(e.target===dialog)close()});dialog.addEventListener('close',()=>{active=null;if(focusBack?.focus)focusBack.focus()});
-$('#fav').addEventListener('click',()=>{fav=fav.includes(active.id)?fav.filter(x=>x!==active.id):[...fav,active.id];writeStorage('favorites',fav);$('#fav').textContent=fav.includes(active.id)?'★':'☆';$('#fav').setAttribute('aria-label',t(fav.includes(active.id)?'unfavorite':'favorite'));render()});
-$('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(result.textContent);$('#copy').textContent=t('copied')}catch{$('#copy').textContent=t('copyFailed')}});
-search.addEventListener('input',render);$('#categories').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;cat=b.dataset.cat;document.querySelectorAll('.category-tab').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});render()});
-function updatePreferenceMenus(){const lang=getLanguage(),theme=getTheme(),labels={de:{auto:'Automatisch',light:'Hell',dark:'Dunkel'},en:{auto:'System',light:'Light',dark:'Dark'}};$('#languageLabel').textContent=lang.toUpperCase();$('#themeLabel').textContent=labels[lang][theme];document.querySelectorAll('[data-menu="language"] [data-value]').forEach(b=>{const selected=b.dataset.value===lang;b.classList.toggle('selected',selected);b.setAttribute('aria-checked',String(selected))});document.querySelectorAll('[data-menu="theme"] [data-value]').forEach(b=>{const selected=b.dataset.value===theme;b.classList.toggle('selected',selected);b.setAttribute('aria-checked',String(selected))})}
-document.querySelectorAll('.preference-wrap').forEach(wrap=>{const trigger=wrap.querySelector('.preference-trigger'),menu=wrap.querySelector('.preference-menu');trigger.addEventListener('click',()=>{const opening=menu.hidden;document.querySelectorAll('.preference-menu').forEach(m=>{m.hidden=true;m.parentElement.querySelector('.preference-trigger').setAttribute('aria-expanded','false')});menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening))});menu.addEventListener('click',e=>{const option=e.target.closest('[data-value]');if(!option)return;if(wrap.dataset.menu==='language'){setLanguage(option.dataset.value);writeStorage('language',getLanguage());localize()}else{setTheme(option.dataset.value);updatePreferenceMenus()}menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus()});menu.addEventListener('keydown',e=>{const items=[...menu.querySelectorAll('[data-value]')],i=items.indexOf(document.activeElement);let next;if(e.key==='ArrowDown')next=items[(i+1+items.length)%items.length];else if(e.key==='ArrowUp')next=items[(i-1+items.length)%items.length];else if(e.key==='Home')next=items[0];else if(e.key==='End')next=items[items.length-1];else return;e.preventDefault();next.focus()});trigger.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();menu.hidden=false;trigger.setAttribute('aria-expanded','true');menu.querySelector('[data-value]')?.focus()}})});
-document.addEventListener('click',e=>{if(!e.target.closest('.preference-wrap'))document.querySelectorAll('.preference-menu').forEach(m=>{m.hidden=true;m.parentElement.querySelector('.preference-trigger').setAttribute('aria-expanded','false')})});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.preference-menu').forEach(m=>{if(!m.hidden){m.hidden=true;m.parentElement.querySelector('.preference-trigger').setAttribute('aria-expanded','false');m.parentElement.querySelector('.preference-trigger').focus()}})});
-installSearchShortcut(search);
-function hash(){const id=location.hash.startsWith('#tool=')?location.hash.slice(6):'';if(id&&!dialog.open)open(id)}window.addEventListener('hashchange',hash);localize();hash();
+import { t, setLanguage, getLanguage } from './i18n.js';
+import { initTheme, setTheme, getTheme } from './theme.js';
+import { readStorage, writeStorage } from './storage.js';
+import { filterTools, installSearchShortcut } from './search.js';
+import { tools, getTool } from './tools/registry.js';
+
+const SELECTORS = {
+    app: '#app',
+    dialog: '#dialog',
+    search: '#search',
+    input: '#input',
+    result: '#result',
+    grid: '#grid',
+    recent: '#recent',
+    empty: '#empty',
+    categories: '#categories',
+    actions: '#actions',
+    favorite: '#fav',
+    close: '#close',
+    copy: '#copy',
+};
+
+const TOOL_ICONS = {
+    calculator: '＋',
+    json: '{ }',
+    text: 'Aa',
+    base64: '⇄',
+};
+
+const THEME_LABELS = {
+    de: { auto: 'Automatisch', light: 'Hell', dark: 'Dunkel' },
+    en: { auto: 'System', light: 'Light', dark: 'Dark' },
+};
+
+const $ = (selector, parent = document) => parent.querySelector(selector);
+
+export function mountApp(root) {
+    if (!root) {
+        return;
+    }
+
+    initTheme();
+    setLanguage(readStorage('language', 'de'));
+
+    const state = {
+        favorites: readStorage('favorites', []),
+        recent: readStorage('recent', []),
+        category: 'all',
+        activeTool: null,
+        returnFocus: null,
+    };
+
+    renderApplication(root);
+
+    const elements = {
+        dialog: $(SELECTORS.dialog),
+        search: $(SELECTORS.search),
+        input: $(SELECTORS.input),
+        result: $(SELECTORS.result),
+        grid: $(SELECTORS.grid),
+        recent: $(SELECTORS.recent),
+        empty: $(SELECTORS.empty),
+        categories: $(SELECTORS.categories),
+        actions: $(SELECTORS.actions),
+        favorite: $(SELECTORS.favorite),
+        close: $(SELECTORS.close),
+        copy: $(SELECTORS.copy),
+    };
+
+    bindEvents(elements, state);
+    localizeInterface(elements, state);
+    renderToolCollections(elements, state);
+    installSearchShortcut(elements.search);
+
+    handleToolHash(elements, state);
+    window.addEventListener('hashchange', () => handleToolHash(elements, state));
+}
+
+/** Creates the static application shell. Dynamic tool content is rendered separately. */
+function renderApplication(root) {
+    root.innerHTML = `
+        <div class="app-shell container-xl px-3">
+            <header class="topbar d-flex justify-content-between align-items-center">
+                <a class="brand" href="./">
+                    <span class="brand-mark" aria-hidden="true">⌘</span>
+                    MyTools
+                </a>
+
+                <div class="header-actions">
+                    <span class="local-status">
+                        ● <span data-i18n="local"></span>
+                    </span>
+
+                    <div class="preference-wrap" data-menu="language">
+                        <button
+                            class="preference-trigger"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-label="Language"
+                        >
+                            <span class="pref-trigger-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path>
+                                </svg>
+                            </span>
+                            <span class="pref-trigger-label" id="languageLabel">DE</span>
+                            <svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="m5 7 5 5 5-5"></path>
+                            </svg>
+                        </button>
+
+                        <div class="preference-menu" role="menu" hidden>
+                            <button type="button" role="menuitemradio" data-value="de">
+                                <span class="menu-flag">DE</span>
+                                <span>Deutsch</span>
+                                <span class="menu-check" aria-hidden="true">✓</span>
+                            </button>
+                            <button type="button" role="menuitemradio" data-value="en">
+                                <span class="menu-flag">EN</span>
+                                <span>English</span>
+                                <span class="menu-check" aria-hidden="true">✓</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="preference-wrap" data-menu="theme">
+                        <button
+                            class="preference-trigger"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            aria-label="Appearance"
+                        >
+                            <span class="pref-trigger-icon" id="themeIcon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path>
+                                </svg>
+                            </span>
+                            <span class="pref-trigger-label" id="themeLabel"></span>
+                            <svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="m5 7 5 5 5-5"></path>
+                            </svg>
+                        </button>
+
+                        <div class="preference-menu" role="menu" hidden>
+                            <button type="button" role="menuitemradio" data-value="auto">
+                                <span class="menu-choice-icon" aria-hidden="true">◐</span>
+                                <span data-i18n="auto"></span>
+                                <span class="menu-check" aria-hidden="true">✓</span>
+                            </button>
+                            <button type="button" role="menuitemradio" data-value="light">
+                                <span class="menu-choice-icon" aria-hidden="true">☼</span>
+                                <span data-i18n="light"></span>
+                                <span class="menu-check" aria-hidden="true">✓</span>
+                            </button>
+                            <button type="button" role="menuitemradio" data-value="dark">
+                                <span class="menu-choice-icon" aria-hidden="true">☾</span>
+                                <span data-i18n="dark"></span>
+                                <span class="menu-check" aria-hidden="true">✓</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="hero">
+                <div class="eyebrow" data-i18n="eyebrow"></div>
+                <h1>
+                    <span data-i18n="headlineA"></span><br>
+                    <span class="hero-accent" data-i18n="headlineB"></span>
+                </h1>
+                <p data-i18n="intro"></p>
+                <div class="hero-meta">
+                    ✦ <span data-i18n="local"></span> ·
+                    ${tools.length} <span data-i18n="allTools"></span>
+                </div>
+                <div class="hero-orbit" aria-hidden="true"></div>
+            </section>
+
+            <main>
+                <div class="section-top">
+                    <div>
+                        <p class="section-kicker">WORKSPACE</p>
+                        <h2 data-i18n="allTools"></h2>
+                    </div>
+
+                    <label class="search-box">
+                        <span class="search-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                                <path d="m16 16 4.2 4.2"></path>
+                            </svg>
+                        </span>
+                        <input
+                            id="search"
+                            type="search"
+                            data-i18n-placeholder="searchPlaceholder"
+                            aria-label="Search tools"
+                        >
+                        <kbd>Ctrl K</kbd>
+                    </label>
+                </div>
+
+                <nav class="category-tabs" id="categories" aria-label="Tool categories">
+                    <button class="category-tab active" type="button" data-cat="all" data-i18n="categoryAll" aria-pressed="true"></button>
+                    <button class="category-tab" type="button" data-cat="text" data-i18n="categoryText" aria-pressed="false"></button>
+                    <button class="category-tab" type="button" data-cat="dev" data-i18n="categoryDev" aria-pressed="false"></button>
+                    <button class="category-tab" type="button" data-cat="utility" data-i18n="categoryUtility" aria-pressed="false"></button>
+                    <button class="category-tab" type="button" data-cat="favorites" data-i18n="favorites" aria-pressed="false"></button>
+                </nav>
+
+                <div id="grid" class="tool-grid"></div>
+                <p id="empty" hidden data-i18n="noResults"></p>
+
+                <section class="quick-sections">
+                    <h2 data-i18n="recent"></h2>
+                    <div id="recent" class="recent-grid"></div>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <strong>⌘ MyTools</strong>
+                <span data-i18n="privacy"></span>
+                <span>© 2026</span>
+            </footer>
+        </div>
+
+        <dialog id="dialog" class="tool-dialog" aria-labelledby="toolTitle">
+            <div class="dialog-top">
+                <div class="dialog-heading">
+                    <div id="toolIcon" class="dialog-icon" aria-hidden="true"></div>
+                    <div>
+                        <h2 id="toolTitle"></h2>
+                        <p id="hint"></p>
+                    </div>
+                </div>
+
+                <div class="dialog-controls">
+                    <button id="fav" class="icon-button" type="button" aria-label="Favorite">☆</button>
+                    <button id="close" class="icon-button" type="button" aria-label="Close">×</button>
+                </div>
+            </div>
+
+            <div class="dialog-body">
+                <label class="field-label" for="input" data-i18n="input"></label>
+                <textarea id="input" class="tool-input"></textarea>
+
+                <div id="actions" class="action-row"></div>
+
+                <div class="result-heading">
+                    <label class="field-label" for="result" data-i18n="output"></label>
+                    <button id="copy" class="copy-button" type="button" data-i18n="copy"></button>
+                </div>
+                <pre id="result" class="tool-result" aria-live="polite"></pre>
+            </div>
+        </dialog>
+    `;
+}
+
+/** Connects UI events once, using delegation for dynamic content. */
+function bindEvents(elements, state) {
+    elements.grid.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-open]');
+
+        if (button) {
+            openTool(button.dataset.open, button, elements, state);
+        }
+    });
+
+    elements.recent.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-open]');
+
+        if (button) {
+            openTool(button.dataset.open, button, elements, state);
+        }
+    });
+
+    elements.actions.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action]');
+        const action = state.activeTool?.actions.find(
+            (item) => item.id === button?.dataset.action,
+        );
+
+        if (!action) {
+            return;
+        }
+
+        try {
+            elements.result.textContent = action.run(
+                elements.input.value,
+                getLanguage(),
+                t,
+            );
+        } catch (error) {
+            elements.result.textContent = getToolErrorMessage(error);
+        }
+    });
+
+    elements.close.addEventListener('click', () => closeTool(elements, state));
+    elements.dialog.addEventListener('click', (event) => {
+        if (event.target === elements.dialog) {
+            closeTool(elements, state);
+        }
+    });
+
+    elements.dialog.addEventListener('close', () => {
+        state.activeTool = null;
+
+        if (state.returnFocus?.focus) {
+            state.returnFocus.focus();
+        }
+
+        state.returnFocus = null;
+
+        if (location.hash.startsWith('#tool=')) {
+            history.replaceState(null, '', location.pathname);
+        }
+    });
+
+    elements.favorite.addEventListener('click', () => {
+        if (!state.activeTool) {
+            return;
+        }
+
+        toggleFavorite(state.activeTool.id, elements, state);
+    });
+
+    elements.copy.addEventListener('click', () => copyResult(elements.copy, elements.result));
+
+    elements.search.addEventListener('input', () => {
+        renderToolCollections(elements, state);
+    });
+
+    elements.categories.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-cat]');
+
+        if (!button) {
+            return;
+        }
+
+        state.category = button.dataset.cat;
+        updateCategorySelection(elements.categories, state.category);
+        renderToolCollections(elements, state);
+    });
+
+    bindPreferenceMenus(elements);
+}
+
+/** Opens a tool dialog and records the tool in the recent list. */
+function openTool(toolId, trigger, elements, state) {
+    const tool = getTool(toolId);
+
+    if (!tool) {
+        return;
+    }
+
+    state.activeTool = tool;
+    state.returnFocus = trigger ?? document.activeElement;
+    state.recent = [toolId, ...state.recent.filter((id) => id !== toolId)].slice(0, 5);
+
+    writeStorage('recent', state.recent);
+
+    $('#toolIcon').textContent = TOOL_ICONS[toolId] ?? '';
+    $('#toolTitle').textContent = t(tool.nameKey);
+    $('#hint').textContent = t(tool.hintKey);
+
+    elements.input.value = '';
+    elements.input.placeholder = t(tool.placeholderKey);
+    elements.result.textContent = t('emptyResult');
+
+    updateFavoriteButton(elements.favorite, state);
+    renderToolActions(elements.actions, tool);
+    elements.dialog.showModal();
+    elements.input.focus();
+
+    renderRecentTools(elements.recent, state);
+
+    history.replaceState(null, '', `#tool=${toolId}`);
+}
+
+/** Closes the active dialog. The dialog's close event restores focus. */
+function closeTool(elements, state) {
+    if (elements.dialog.open) {
+        elements.dialog.close();
+    }
+
+    state.activeTool = null;
+}
+
+/** Adds or removes the active tool from the persisted favorites. */
+function toggleFavorite(toolId, elements, state) {
+    const isFavorite = state.favorites.includes(toolId);
+
+    state.favorites = isFavorite
+        ? state.favorites.filter((id) => id !== toolId)
+        : [...state.favorites, toolId];
+
+    writeStorage('favorites', state.favorites);
+    updateFavoriteButton(elements.favorite, state);
+    renderToolCollections(elements, state);
+}
+
+/** Keeps the favorite button's icon and accessible name in sync. */
+function updateFavoriteButton(button, state) {
+    if (!state.activeTool) {
+        return;
+    }
+
+    const isFavorite = state.favorites.includes(state.activeTool.id);
+
+    button.textContent = isFavorite ? '★' : '☆';
+    button.setAttribute('aria-label', t(isFavorite ? 'unfavorite' : 'favorite'));
+}
+
+/** Builds the available action buttons for the selected tool. */
+function renderToolActions(container, tool) {
+    container.innerHTML = tool.actions
+        .map((action) => {
+            const buttonClass = action.primary ? 'action-button primary' : 'action-button';
+
+            return `
+                <button
+                    class="${buttonClass}"
+                    type="button"
+                    data-action="${action.id}"
+                >
+                    ${t(action.labelKey)}
+                </button>
+            `;
+        })
+        .join('');
+}
+
+/** Displays a localized message for known tool errors. */
+function getToolErrorMessage(error) {
+    const errorMessages = {
+        zero: 'calcZero',
+        empty: 'calcEmpty',
+        syntax: 'calcInvalid',
+    };
+
+    return errorMessages[error.message]
+        ? t(errorMessages[error.message])
+        : error.message || t('calcInvalid');
+}
+
+/** Copies the current result and briefly updates the button label. */
+async function copyResult(button, result) {
+    try {
+        await navigator.clipboard.writeText(result.textContent);
+        button.textContent = t('copied');
+    } catch {
+        button.textContent = t('copyFailed');
+    }
+}
+
+/** Renders the filtered tool cards and recent tools. */
+function renderToolCollections(elements, state) {
+    const visibleTools = filterTools(
+        tools,
+        elements.search.value,
+        state.category,
+        state.favorites,
+    );
+
+    elements.grid.innerHTML = visibleTools.map(renderToolCard).join('');
+    elements.empty.hidden = visibleTools.length > 0;
+
+    renderRecentTools(elements.recent, state);
+}
+
+/** Returns the markup for one tool card. */
+function renderToolCard(tool) {
+    const categoryKey = getCategoryTranslationKey(tool.category);
+    const icon = TOOL_ICONS[tool.id] ?? '';
+    const favoriteIcon = '☆';
+
+    return `
+        <button
+            class="tool-card"
+            type="button"
+            data-open="${tool.id}"
+            aria-label="${t('open')} ${t(tool.nameKey)}"
+        >
+            <span class="tool-card-top">
+                <span class="tool-icon" aria-hidden="true">${icon}</span>
+                <span aria-hidden="true">↗</span>
+            </span>
+            <b class="tool-card-title">${t(tool.nameKey)}</b>
+            <span class="tool-card-description">${t(tool.descriptionKey)}</span>
+            <span class="tool-card-bottom">
+                <small>${t(categoryKey)}</small>
+                <span aria-hidden="true">${favoriteIcon}</span>
+            </span>
+        </button>
+    `;
+}
+
+/** Returns the translation key for a tool category. */
+function getCategoryTranslationKey(category) {
+    const categoryKeys = {
+        dev: 'categoryDev',
+        text: 'categoryText',
+        utility: 'categoryUtility',
+    };
+
+    return categoryKeys[category] ?? 'categoryUtility';
+}
+
+/** Renders the recently opened tools. */
+function renderRecentTools(container, state) {
+    const recentTools = state.recent
+        .slice(0, 3)
+        .map(getTool)
+        .filter(Boolean);
+
+    if (recentTools.length === 0) {
+        container.textContent = t('emptyRecent');
+        return;
+    }
+
+    container.innerHTML = recentTools
+        .map((tool) => `
+            <button
+                class="recent-item"
+                type="button"
+                data-open="${tool.id}"
+                aria-label="${t('open')} ${t(tool.nameKey)}"
+            >
+                <span class="recent-icon" aria-hidden="true">${TOOL_ICONS[tool.id] ?? ''}</span>
+                <span>${t(tool.nameKey)}</span>
+            </button>
+        `)
+        .join('');
+}
+
+/** Applies active state and ARIA state to the category buttons. */
+function updateCategorySelection(container, selectedCategory) {
+    container.querySelectorAll('[data-cat]').forEach((button) => {
+        const isSelected = button.dataset.cat === selectedCategory;
+
+        button.classList.toggle('active', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+    });
+}
+
+/** Updates all translated text and controls after a language change. */
+function localizeInterface(elements, state) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        element.textContent = t(element.dataset.i18n);
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+        element.placeholder = t(element.dataset.i18nPlaceholder);
+    });
+
+    elements.search.setAttribute('aria-label', t('searchLabel'));
+    elements.close.setAttribute('aria-label', t('close'));
+
+    if (state.activeTool) {
+        $('#toolTitle').textContent = t(state.activeTool.nameKey);
+        $('#hint').textContent = t(state.activeTool.hintKey);
+        elements.input.placeholder = t(state.activeTool.placeholderKey);
+        renderToolActions(elements.actions, state.activeTool);
+        updateFavoriteButton(elements.favorite, state);
+    }
+
+    updatePreferenceMenus();
+    renderToolCollections(elements, state);
+}
+
+/** Updates the labels and selected state of both preference menus. */
+function updatePreferenceMenus() {
+    const language = getLanguage();
+    const theme = getTheme();
+
+    $('#languageLabel').textContent = language.toUpperCase();
+    $('#themeLabel').textContent = THEME_LABELS[language][theme];
+
+    document.querySelectorAll('[data-menu="language"] [data-value]').forEach((button) => {
+        updateMenuItem(button, button.dataset.value === language);
+    });
+
+    document.querySelectorAll('[data-menu="theme"] [data-value]').forEach((button) => {
+        updateMenuItem(button, button.dataset.value === theme);
+    });
+}
+
+function updateMenuItem(button, isSelected) {
+    button.classList.toggle('selected', isSelected);
+    button.setAttribute('aria-checked', String(isSelected));
+}
+
+/** Connects language and theme popovers, including keyboard navigation. */
+function bindPreferenceMenus() {
+    document.querySelectorAll('.preference-wrap').forEach((wrapper) => {
+        const trigger = $('.preference-trigger', wrapper);
+        const menu = $('.preference-menu', wrapper);
+
+        trigger.addEventListener('click', () => {
+            togglePreferenceMenu(wrapper);
+        });
+
+        menu.addEventListener('click', (event) => {
+            const option = event.target.closest('[data-value]');
+
+            if (!option) {
+                return;
+            }
+
+            if (wrapper.dataset.menu === 'language') {
+                setLanguage(option.dataset.value);
+                writeStorage('language', getLanguage());
+                localizeInterface(getInterfaceElements(), getCurrentState());
+            } else {
+                setTheme(option.dataset.value);
+                updatePreferenceMenus();
+            }
+
+            closePreferenceMenu(wrapper, true);
+        });
+
+        menu.addEventListener('keydown', (event) => {
+            handleMenuKeyboard(event, menu, trigger);
+        });
+
+        trigger.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                openPreferenceMenu(wrapper);
+                $('[data-value]', menu)?.focus();
+            }
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.preference-wrap')) {
+            closeAllPreferenceMenus();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeAllPreferenceMenus(true);
+        }
+    });
+}
+
+/*
+ * These references are assigned by mountApp so preference handlers can update
+ * the existing application without querying and rebuilding unrelated elements.
+ */
+let interfaceElements = null;
+let applicationState = null;
+
+function getInterfaceElements() {
+    return interfaceElements;
+}
+
+function getCurrentState() {
+    return applicationState;
+}
+
+function togglePreferenceMenu(wrapper) {
+    const menu = $('.preference-menu', wrapper);
+
+    if (menu.hidden) {
+        closeAllPreferenceMenus();
+        openPreferenceMenu(wrapper);
+    } else {
+        closePreferenceMenu(wrapper);
+    }
+}
+
+function openPreferenceMenu(wrapper) {
+    const menu = $('.preference-menu', wrapper);
+    const trigger = $('.preference-trigger', wrapper);
+
+    menu.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+}
+
+function closePreferenceMenu(wrapper, restoreFocus = false) {
+    const menu = $('.preference-menu', wrapper);
+    const trigger = $('.preference-trigger', wrapper);
+
+    menu.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+
+    if (restoreFocus) {
+        trigger.focus();
+    }
+}
+
+function closeAllPreferenceMenus(restoreFocus = false) {
+    document.querySelectorAll('.preference-wrap').forEach((wrapper) => {
+        const menu = $('.preference-menu', wrapper);
+
+        if (!menu.hidden) {
+            closePreferenceMenu(wrapper, restoreFocus);
+        }
+    });
+}
+
+function handleMenuKeyboard(event, menu, trigger) {
+    const items = [...menu.querySelectorAll('[data-value]')];
+    const currentIndex = items.indexOf(document.activeElement);
+    let nextItem;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            nextItem = items[(currentIndex + 1) % items.length];
+            break;
+        case 'ArrowUp':
+            nextItem = items[(currentIndex - 1 + items.length) % items.length];
+            break;
+        case 'Home':
+            nextItem = items[0];
+            break;
+        case 'End':
+            nextItem = items[items.length - 1];
+            break;
+        default:
+            return;
+    }
+
+    event.preventDefault();
+    nextItem?.focus();
+}
+
+/** Opens a tool when a valid tool ID is present in the URL hash. */
+function handleToolHash(elements, state) {
+    const toolId = location.hash.startsWith('#tool=')
+        ? location.hash.slice('#tool='.length)
+        : '';
+
+    if (toolId && !elements.dialog.open) {
+        openTool(toolId, null, elements, state);
+    }
 }
