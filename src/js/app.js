@@ -664,6 +664,64 @@ function localizeInterface(elements, state) {
     renderToolCollections(elements, state);
 }
 
+/** Updates the visible preference icons, accessible labels, and selected menu items. */
+function updatePreferenceMenus() {
+    const language = getLanguage();
+    const theme = getTheme();
+    const languageName = language === 'de' ? 'Deutsch' : 'English';
+    const themeLabel = THEME_LABELS[language][theme];
+
+    const languageIcon = $('#languageIcon');
+    const languageLabel = $('#languageLabel');
+    const themeIcon = $('#themeIcon');
+    const themeLabelElement = $('#themeLabel');
+    const languageTrigger = $('[data-menu="language"] .preference-trigger');
+    const themeTrigger = $('[data-menu="theme"] .preference-trigger');
+
+    if (languageIcon) {
+        languageIcon.textContent = language === 'de' ? '🇩🇪' : '🇬🇧';
+    }
+
+    if (languageLabel) {
+        languageLabel.textContent = languageName;
+    }
+
+    const themeIcons = {
+        auto: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path></svg>',
+        light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>',
+        dark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path></svg>',
+    };
+
+    if (themeIcon) {
+        themeIcon.innerHTML = themeIcons[theme];
+    }
+
+    if (themeLabelElement) {
+        themeLabelElement.textContent = themeLabel;
+    }
+
+    languageTrigger?.setAttribute(
+        'aria-label',
+        language === 'de' ? 'Sprache: ' + languageName : 'Language: ' + languageName,
+    );
+    themeTrigger?.setAttribute(
+        'aria-label',
+        (language === 'de' ? 'Darstellung: ' : 'Appearance: ') + themeLabel,
+    );
+
+    document.querySelectorAll('[data-menu="language"] [data-value]').forEach((button) => {
+        const selected = button.dataset.value === language;
+        button.classList.toggle('selected', selected);
+        button.setAttribute('aria-checked', String(selected));
+    });
+
+    document.querySelectorAll('[data-menu="theme"] [data-value]').forEach((button) => {
+        const selected = button.dataset.value === theme;
+        button.classList.toggle('selected', selected);
+        button.setAttribute('aria-checked', String(selected));
+    });
+}
+
 /** Updates the labels and selected state of both preference menus. */
 /** Connects language and theme popovers, including keyboard navigation. */
 function bindPreferenceMenus(elements, state) {
