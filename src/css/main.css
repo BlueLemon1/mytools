@@ -756,6 +756,13 @@ button {
     color: var(--text);
 }
 
+.tool-option-hint {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
 .tool-option-input:focus {
     border-color: var(--accent);
     outline: 3px solid var(--focus);
