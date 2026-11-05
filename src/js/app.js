@@ -440,6 +440,7 @@ function renderToolOptions(container, tool) {
         'power-automate': `
             <label class="field-label" for="expressionName">${t('expressionFunction')}</label>
             <select id="expressionName" class="tool-option-input">
+                <option value="custom">${t('customExpression')}</option>
                 <option value="coalesce">coalesce()</option><option value="if">if()</option><option value="equals">equals()</option>
                 <option value="contains">contains()</option><option value="startsWith">startsWith()</option><option value="endsWith">endsWith()</option>
                 <option value="length">length()</option><option value="first">first()</option><option value="last">last()</option>
