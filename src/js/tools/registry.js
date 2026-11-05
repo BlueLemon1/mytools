@@ -21,7 +21,8 @@ import { testRegex } from './regex.js';
 import { convertDateTime } from './datetime.js';
 import { parseUrl } from './url.js';
 import { formatXml, minifyXml } from './xml.js';
-\nfunction createCalculatorTool() {
+
+function createCalculatorTool() {
     return {
         id: 'calculator',
         category: 'utility',
