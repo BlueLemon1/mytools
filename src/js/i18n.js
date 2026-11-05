@@ -40,7 +40,7 @@ const translations = {
         categoryUtility: 'Alltag',
         language: 'Sprache',
         theme: 'Darstellung',
-        auto: 'Automatisch',
+        auto: 'System',
         light: 'Hell',
         dark: 'Dunkel',
 
