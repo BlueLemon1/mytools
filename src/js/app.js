@@ -379,8 +379,7 @@ function openTool(toolId, trigger, elements, state) {
     elements.result.textContent = t('emptyResult');
 
     updateFavoriteButton(elements.favorite, state);
-    renderToolOptions(elements.options, tool);
-    renderToolActions(elements.actions, tool);
+    renderToolOptions(elements.options, tool);    renderToolActions(elements.actions, tool);
     elements.dialog.showModal();
     elements.input.focus();
 
