@@ -379,7 +379,7 @@ function openTool(toolId, trigger, elements, state) {
     elements.result.textContent = t('emptyResult');
 
     updateFavoriteButton(elements.favorite, state);
-    renderToolOptions(elements.options, tool);\n    renderToolOptions(elements.options, tool);\n    renderToolOptions(elements.options, tool);
+    renderToolOptions(elements.options, tool);
     renderToolActions(elements.actions, tool);
     elements.dialog.showModal();
     elements.input.focus();
@@ -482,7 +482,12 @@ function getToolErrorMessage(error) {
         zero: 'calcZero',
         empty: 'calcEmpty',
         syntax: 'calcInvalid',
-        invalidJson: 'invalidJson',\n        invalidJwt: 'invalidJwt',\n        invalidXml: 'invalidXml',\n        invalidUrl: 'invalidUrl',\n        invalidDate: 'invalidDate',\n        regexPatternRequired: 'regexPatternRequired',
+        invalidJson: 'invalidJson',
+        invalidJwt: 'invalidJwt',
+        invalidXml: 'invalidXml',
+        invalidUrl: 'invalidUrl',
+        invalidDate: 'invalidDate',
+        regexPatternRequired: 'regexPatternRequired',
     };
 
     return errorMessages[error.message]
