@@ -290,6 +290,13 @@ export const tools = [
     createJsonTool(),
     createTextTool(),
     createBase64Tool(),
+    createJsonSchemaTool(),
+    createJsonDiffTool(),
+    createRegexTool(),
+    createJwtTool(),
+    createXmlTool(),
+    createUrlTool(),
+    createDateTimeTool(),
 ];
 
 export function getTool(id) {
