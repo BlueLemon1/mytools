@@ -18,6 +18,7 @@ const SELECTORS = {
     favorite: '#fav',
     close: '#close',
     copy: '#copy',
+    options: '#toolOptions',
 };
 
 const TOOL_ICONS = {
@@ -25,6 +26,13 @@ const TOOL_ICONS = {
     json: '{ }',
     text: 'Aa',
     base64: '⇄',
+    'json-schema': '{ }',
+    'json-diff': '⇄',
+    regex: '.*',
+    jwt: 'JWT',
+    xml: '</>',
+    url: '↗',
+    datetime: '◷',
 };
 
 const THEME_LABELS = {
@@ -65,6 +73,7 @@ export function mountApp(root) {
         favorite: $(SELECTORS.favorite),
         close: $(SELECTORS.close),
         copy: $(SELECTORS.copy),
+        options: $(SELECTORS.options),
     };
 
     bindEvents(elements, state);
@@ -245,7 +254,7 @@ function renderApplication(root) {
                 <label class="field-label" for="input" data-i18n="input"></label>
                 <textarea id="input" class="tool-input"></textarea>
 
-                <div id="actions" class="action-row"></div>
+                <div id="toolOptions" class="tool-options"></div>\n                <div id="actions" class="action-row"></div>
 
                 <div class="result-heading">
                     <label class="field-label" for="result" data-i18n="output"></label>
@@ -369,7 +378,7 @@ function openTool(toolId, trigger, elements, state) {
     elements.result.textContent = t('emptyResult');
 
     updateFavoriteButton(elements.favorite, state);
-    renderToolActions(elements.actions, tool);
+    renderToolOptions(elements.options, tool);\n    renderToolActions(elements.actions, tool);
     elements.dialog.showModal();
     elements.input.focus();
 
@@ -410,6 +419,40 @@ function updateFavoriteButton(button, state) {
 
     button.textContent = isFavorite ? '★' : '☆';
     button.setAttribute('aria-label', t(isFavorite ? 'unfavorite' : 'favorite'));
+}
+
+
+/** Renders optional, tool-specific controls without changing the shared dialog. */
+function renderToolOptions(container, tool) {
+    const optionMarkup = {
+        'json-schema': `
+            <label class="tool-option"><input id="schemaOmitTypes" type="checkbox"> <span>${t('schemaOmitTypes')}</span></label>
+            <label class="tool-option"><input id="schemaAllRequired" type="checkbox" checked> <span>${t('schemaAllRequired')}</span></label>
+        `,
+        'json-diff': `
+            <label class="field-label" for="compareInput">${t('compareInput')}</label>
+            <textarea id="compareInput" class="tool-input" placeholder='{"example":true}'></textarea>
+        `,
+        regex: `
+            <label class="field-label" for="regexPattern">${t('regexPattern')}</label>
+            <input id="regexPattern" class="tool-option-input" type="text" placeholder="\\\\d+">
+            <label class="field-label" for="regexFlags">${t('regexFlags')}</label>
+            <input id="regexFlags" class="tool-option-input" type="text" value="gm">
+        `,
+    };
+
+    container.innerHTML = optionMarkup[tool.id] ?? '';
+}
+
+/** Collects optional values for tools that need more than the main input. */
+function getToolOptions(container) {
+    return {
+        omitTypes: $('#schemaOmitTypes', container)?.checked ?? false,
+        allRequired: $('#schemaAllRequired', container)?.checked ?? true,
+        compareInput: $('#compareInput', container)?.value ?? '',
+        pattern: $('#regexPattern', container)?.value ?? '',
+        flags: $('#regexFlags', container)?.value ?? 'gm',
+    };
 }
 
 /** Builds the available action buttons for the selected tool. */
@@ -565,7 +608,7 @@ function localizeInterface(elements, state) {
         $('#toolTitle').textContent = t(state.activeTool.nameKey);
         $('#hint').textContent = t(state.activeTool.hintKey);
         elements.input.placeholder = t(state.activeTool.placeholderKey);
-        renderToolActions(elements.actions, state.activeTool);
+        renderToolOptions(elements.options, state.activeTool);\n        renderToolActions(elements.actions, state.activeTool);
         updateFavoriteButton(elements.favorite, state);
     }
 
