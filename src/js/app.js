@@ -109,10 +109,7 @@ function renderApplication(root) {
                             aria-label="Language"
                         >
                             <span class="pref-trigger-icon language-flag" id="languageIcon" aria-hidden="true">🇩🇪</span>
-                            <span class="pref-trigger-label" id="languageLabel">DE</span>
-                            <svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true">
-                                <path d="m5 7 5 5 5-5"></path>
-                            </svg>
+                            <span class="visually-hidden" id="languageLabel">DE</span>
                         </button>
 
                         <div class="preference-menu" role="menu" hidden>
@@ -142,10 +139,7 @@ function renderApplication(root) {
                                     <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path>
                                 </svg>
                             </span>
-                            <span class="pref-trigger-label" id="themeLabel"></span>
-                            <svg class="pref-chevron" viewBox="0 0 20 20" aria-hidden="true">
-                                <path d="m5 7 5 5 5-5"></path>
-                            </svg>
+                            <span class="visually-hidden" id="themeLabel"></span>
                         </button>
 
                         <div class="preference-menu" role="menu" hidden>
@@ -590,11 +584,16 @@ function updatePreferenceMenus() {
 
     const themeIcon = $('#themeIcon');
     const themeIcons = {
-        auto: '<circle cx="12" cy="12" r="8"></circle><path d="M12 4v16M12 4a8 8 0 0 1 0 16"></path>',
-        light: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>',
-        dark: '<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path>',
+        auto: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path></svg>',
+        light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>',
+        dark: '<svg viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"></path></svg>',
     };
     themeIcon.innerHTML = themeIcons[theme];
+    const themeLabel = THEME_LABELS[language][theme];
+    $('#languageLabel').textContent = language === 'de' ? 'Deutsch' : 'English';
+    $('#themeLabel').textContent = themeLabel;
+    $('[data-menu="language"] .preference-trigger').setAttribute('aria-label', language === 'de' ? 'Sprache: ' + $('#languageLabel').textContent : 'Language: ' + $('#languageLabel').textContent);
+    $('[data-menu="theme"] .preference-trigger').setAttribute('aria-label', (language === 'de' ? 'Darstellung: ' : 'Appearance: ') + themeLabel);
 
     document.querySelectorAll('[data-menu="language"] [data-value]').forEach((button) => {
         updateMenuItem(button, button.dataset.value === language);
