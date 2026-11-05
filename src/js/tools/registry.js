@@ -13,7 +13,15 @@ import {
     decodeBase64,
 } from './base64.js';
 
-function createCalculatorTool() {
+
+import { generateJsonSchema } from './json-schema.js';
+import { diffJson } from './json-diff.js';
+import { decodeJwt } from './jwt.js';
+import { testRegex } from './regex.js';
+import { convertDateTime } from './datetime.js';
+import { parseUrl } from './url.js';
+import { formatXml, minifyXml } from './xml.js';
+\nfunction createCalculatorTool() {
     return {
         id: 'calculator',
         category: 'utility',
