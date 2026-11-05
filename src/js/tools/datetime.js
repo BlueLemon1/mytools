@@ -10,10 +10,10 @@ export function convertDateTime(source) {
 
     const date = new Date(timestamp);
     return [
-        \`ISO 8601: \${date.toISOString()}\`,
-        \`Unix seconds: \${Math.floor(timestamp / 1000)}\`,
-        \`Unix milliseconds: \${timestamp}\`,
-        \`UTC: \${date.toUTCString()}\`,
-        \`Local: \${date.toLocaleString()}\`,
+        'ISO 8601: ' + date.toISOString(),
+        'Unix seconds: ' + Math.floor(timestamp / 1000),
+        'Unix milliseconds: ' + timestamp,
+        'UTC: ' + date.toUTCString(),
+        'Local: ' + date.toLocaleString(),
     ].join('\n');
 }
