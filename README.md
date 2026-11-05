@@ -1,20 +1,38 @@
 # MyTools
 
-Eine kleine, responsive Toolbox als statische Website.
+A browser-based toolbox. Tool processing happens locally; no user input is sent to a backend.
 
-## Enthaltene Tools
-- Rechner
-- JSON Formatter / Validator
-- Text Converter
-- Base64 Encoder / Decoder
+## Stack
+- Vite + native JavaScript ES modules
+- Bootstrap 5 grid/utilities
+- CSS custom properties for light/dark themes
+- Vitest + jsdom unit tests
+- GitHub Actions for test, build and GitHub Pages deployment
 
-## Lokal testen
-`index.html` direkt im Browser öffnen.
+## Development
+Requires Node.js 22+.
 
-## GitHub Pages aktivieren
-1. Repository → **Settings → Pages** öffnen.
-2. Unter **Build and deployment** `Deploy from a branch` auswählen.
-3. Branch `main`, Ordner `/ (root)` auswählen und speichern.
-4. Nach dem Deployment ist die Website unter https://BlueLemon1.github.io/mytools/ erreichbar.
+```bash
+npm install
+npm run dev
+```
 
-Die Seite benötigt keinen Build-Schritt und keine Drittanbieter-Bibliotheken. Alle Tools laufen lokal im Browser.
+## Checks
+
+```bash
+npm test
+npm run build
+```
+
+## Deployment
+The workflow tests, builds and deploys `dist/` after pushes to `main`. In GitHub, open **Settings → Pages** and select **GitHub Actions** as the source.
+
+## Structure
+- `src/css/`: styles and design tokens
+- `src/js/app.js`: application composition and UI events
+- `src/js/i18n.js`: German and English strings
+- `src/js/theme.js`, `search.js`, `storage.js`: shared features
+- `src/js/tools/`: independent tool modules and tests
+
+## Adding a tool
+Create a module in `src/js/tools/`, register it in `registry.js`, add translations in `i18n.js`, and test non-trivial logic.

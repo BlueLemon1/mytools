@@ -1,0 +1,1 @@
+import{describe,it,expect}from'vitest';import{encodeBase64,decodeBase64}from'./base64.js';describe('Base64 UTF-8',()=>{it('round trips Unicode',()=>{const value='Grüße 世界 🌍';expect(decodeBase64(encodeBase64(value))).toBe(value)});it('rejects invalid UTF-8',()=>{expect(()=>decodeBase64('////')).toThrow()})});

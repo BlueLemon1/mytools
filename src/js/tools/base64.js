@@ -1,0 +1,2 @@
+export function encodeBase64(source){const bytes=new TextEncoder().encode(source);let binary='';bytes.forEach(byte=>binary+=String.fromCharCode(byte));return btoa(binary)}
+export function decodeBase64(source){const binary=atob(source.replace(/\s/g,''));const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return new TextDecoder('utf-8',{fatal:true}).decode(bytes)}
