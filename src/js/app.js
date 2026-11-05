@@ -345,7 +345,7 @@ function bindEvents(elements, state) {
         renderToolCollections(elements, state);
     });
 
-    bindPreferenceMenus(elements);
+    bindPreferenceMenus(elements, state);
 }
 
 /** Opens a tool dialog and records the tool in the recent list. */
@@ -465,17 +465,17 @@ function renderToolCollections(elements, state) {
         state.favorites,
     );
 
-    elements.grid.innerHTML = visibleTools.map(renderToolCard).join('');
+    elements.grid.innerHTML = visibleTools.map((tool) => renderToolCard(tool, state)).join('');
     elements.empty.hidden = visibleTools.length > 0;
 
     renderRecentTools(elements.recent, state);
 }
 
 /** Returns the markup for one tool card. */
-function renderToolCard(tool) {
+function renderToolCard(tool, state) {
     const categoryKey = getCategoryTranslationKey(tool.category);
     const icon = TOOL_ICONS[tool.id] ?? '';
-    const favoriteIcon = '☆';
+    const favoriteIcon = state.favorites.includes(tool.id) ? '★' : '☆';
 
     return `
         <button
@@ -594,7 +594,7 @@ function updateMenuItem(button, isSelected) {
 }
 
 /** Connects language and theme popovers, including keyboard navigation. */
-function bindPreferenceMenus() {
+function bindPreferenceMenus(elements, state) {
     document.querySelectorAll('.preference-wrap').forEach((wrapper) => {
         const trigger = $('.preference-trigger', wrapper);
         const menu = $('.preference-menu', wrapper);
@@ -613,7 +613,7 @@ function bindPreferenceMenus() {
             if (wrapper.dataset.menu === 'language') {
                 setLanguage(option.dataset.value);
                 writeStorage('language', getLanguage());
-                localizeInterface(getInterfaceElements(), getCurrentState());
+                localizeInterface(elements, state);
             } else {
                 setTheme(option.dataset.value);
                 updatePreferenceMenus();
@@ -623,7 +623,7 @@ function bindPreferenceMenus() {
         });
 
         menu.addEventListener('keydown', (event) => {
-            handleMenuKeyboard(event, menu, trigger);
+            handleMenuKeyboard(event, menu);
         });
 
         trigger.addEventListener('keydown', (event) => {
@@ -646,21 +646,6 @@ function bindPreferenceMenus() {
             closeAllPreferenceMenus(true);
         }
     });
-}
-
-/*
- * These references are assigned by mountApp so preference handlers can update
- * the existing application without querying and rebuilding unrelated elements.
- */
-let interfaceElements = null;
-let applicationState = null;
-
-function getInterfaceElements() {
-    return interfaceElements;
-}
-
-function getCurrentState() {
-    return applicationState;
 }
 
 function togglePreferenceMenu(wrapper) {
@@ -704,7 +689,7 @@ function closeAllPreferenceMenus(restoreFocus = false) {
     });
 }
 
-function handleMenuKeyboard(event, menu, trigger) {
+function handleMenuKeyboard(event, menu) {
     const items = [...menu.querySelectorAll('[data-value]')];
     const currentIndex = items.indexOf(document.activeElement);
     let nextItem;
