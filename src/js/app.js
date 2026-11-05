@@ -439,6 +439,7 @@ function getToolErrorMessage(error) {
         zero: 'calcZero',
         empty: 'calcEmpty',
         syntax: 'calcInvalid',
+        invalidJson: 'invalidJson',
     };
 
     return errorMessages[error.message]
