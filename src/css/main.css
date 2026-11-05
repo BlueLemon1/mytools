@@ -201,3 +201,18 @@ button{cursor:pointer}
 .action-button.primary:hover{box-shadow:0 0 16px rgba(241,132,22,.14)}
 .tool-dialog{box-shadow:0 24px 75px rgba(0,0,0,.22)}
 @media(prefers-reduced-motion:reduce){.tool-card:hover,.recent-item:hover{transform:none}}
+
+/* Restore the animated card artwork; remove only the unwanted glossy edge treatment */
+.tool-card{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-solid);box-shadow:none}
+.tool-card::before{content:"";position:absolute;z-index:-1;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--accent),#ffc17e 48%,transparent);opacity:.48;transition:opacity .25s}
+.tool-card::after{display:block;content:"";position:absolute;z-index:-1;right:-42px;top:-48px;width:125px;height:125px;border:1px solid var(--line);border-radius:50%;box-shadow:0 0 0 15px color-mix(in srgb,var(--line) 45%,transparent);opacity:.55;pointer-events:none;transition:transform .35s ease,opacity .35s ease}
+.tool-card:hover::before{opacity:.9}
+.tool-card:hover::after{transform:scale(1.16) rotate(12deg);opacity:.85}
+.tool-card:hover{transform:translateY(-5px);box-shadow:0 9px 24px rgba(20,40,60,.075),0 0 18px rgba(241,132,22,.045)}
+.tool-icon{box-shadow:0 5px 14px rgba(241,132,22,.10)}
+/* Header and controls: matte borders, no highlight/shine */
+.topbar{border:0!important;box-shadow:none!important}
+.preference-trigger{border:1px solid var(--line);box-shadow:none!important;outline:0}
+.preference-trigger:hover,.preference-trigger[aria-expanded=true]{border-color:rgba(241,132,22,.28);box-shadow:none!important}
+.preference-menu{border:1px solid var(--line);box-shadow:0 12px 28px rgba(9,20,32,.13)}
+.brand-mark{box-shadow:0 0 14px rgba(241,132,22,.18)}
