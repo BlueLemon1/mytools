@@ -117,10 +117,10 @@
         <div class="search-wrap"><span class="search-icon">⌕</span><input class="form-control" id="search" type="search" placeholder="Tool suchen …" aria-label="Tools suchen"></div>
       </div>
       <div class="row g-3" id="toolGrid">
-        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="calc"><span class="tool-icon">＋</span><span class="card-arrow">↗</span><h3>Rechner</h3><p>Einfache Berechnungen durchführen</p></button></div>
-        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="json"><span class="tool-icon">{ }</span><span class="card-arrow">↗</span><h3>JSON Formatter</h3><p>JSON formatieren und validieren</p></button></div>
-        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="text"><span class="tool-icon">Aa</span><span class="card-arrow">↗</span><h3>Text Converter</h3><p>Groß-/Kleinschreibung umwandeln</p></button></div>
-        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="base64"><span class="tool-icon">⇄</span><span class="card-arrow">↗</span><h3>Base64</h3><p>Text codieren und decodieren</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="calc" data-keywords="rechnen taschenrechner mathematik prozent"><span class="tool-icon">＋</span><span class="card-arrow">↗</span><h3>Rechner</h3><p>Einfache Berechnungen durchführen</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="json" data-keywords="json formatter formatieren minifizieren validieren validator"><span class="tool-icon">{ }</span><span class="card-arrow">↗</span><h3>JSON Formatter</h3><p>JSON formatieren und validieren</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="text" data-keywords="text groß klein buchstaben trim zeilen statistik wörter umdrehen"><span class="tool-icon">Aa</span><span class="card-arrow">↗</span><h3>Text Converter</h3><p>Groß-/Kleinschreibung umwandeln</p></button></div>
+        <div class="col-6 col-lg-3"><button class="tool-card" data-tool="base64" data-keywords="base64 encoder decoder codieren decodieren utf-8"><span class="tool-icon">⇄</span><span class="card-arrow">↗</span><h3>Base64</h3><p>Text codieren und decodieren</p></button></div>
       </div>
       <p class="privacy-note mt-4 mb-0">Deine Eingaben bleiben auf deinem Gerät. Es werden keine Daten an einen Server übertragen.</p>
     </section>
@@ -160,19 +160,91 @@
     document.addEventListener('click',e=>{if(!e.target.closest('.theme-control')){themeMenu.classList.remove('open');themeTrigger.setAttribute('aria-expanded','false')}});
     systemTheme.addEventListener('change',()=>{if(selectedTheme==='auto')applyTheme('auto')});
 
+    function setResult(value){result.textContent=String(value)}
+    function copyResult(){
+      const value=result.textContent;
+      if(!value||value==='Ergebnis erscheint hier.')return;
+      if(navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(value).then(()=>setResult('In Zwischenablage kopiert ✓')).catch(()=>setResult('Kopieren nicht möglich – bitte Ergebnis markieren und kopieren.'));
+      }else{
+        const helper=document.createElement('textarea');helper.value=value;helper.style.position='fixed';helper.style.opacity='0';document.body.append(helper);helper.select();
+        try{document.execCommand('copy');setResult('In Zwischenablage kopiert ✓')}catch{setResult('Kopieren nicht möglich – bitte Ergebnis markieren und kopieren.')}helper.remove();
+      }
+    }
+    function addButton(label,fn,primary=false){
+      const b=document.createElement('button');b.type='button';b.className='action-btn '+(primary?'primary':'subtle');b.textContent=label;b.addEventListener('click',fn);actions.append(b);
+    }
+    function parseCalculation(source){
+      let text=source.replace(/\s+/g,'');
+      if(!text)throw Error('Bitte einen Rechenausdruck eingeben.');
+      if(text.includes(',')&&!text.includes('.'))text=text.replace(',','.');
+      const tokens=[];const re=/\d+(?:\.\d+)?|(?:\*\*)|[()+\-*/%^]/gy;let pos=0;
+      while(pos<text.length){re.lastIndex=pos;const m=re.exec(text);if(!m)throw Error('Ungültiges Zeichen an Position '+(pos+1)+'.');tokens.push(m[0]);pos=re.lastIndex}
+      let i=0;
+      const peek=()=>tokens[i];
+      const take=()=>tokens[i++];
+      function primary(){
+        if(peek()==='+'||peek()==='-'){const sign=take();const n=primary();return sign==='-'?-n:n}
+        if(peek()==='('){take();const n=expression();if(take()!==')')throw Error('Schließende Klammer fehlt.');return n}
+        const t=take();if(t===undefined||!(/^\d+(?:\.\d+)?$/.test(t)))throw Error('Zahl oder Klammer erwartet.');
+        return Number(t);
+      }
+      function power(){let n=primary();if(peek()==='**'||peek()==='^'){take();n=Math.pow(n,unary())}return n}
+      function unary(){let n=power();while(peek()==='%'){take();n/=100}return n}
+      function term(){let n=unary();while(['*','/','%'].includes(peek())){const op=take(),r=unary();if((op==='/'||op==='%')&&r===0)throw Error('Division durch 0 ist nicht möglich.');n=op==='*'?n*r:op==='/'?n/r:n%r}return n}
+      function expression(){let n=term();while(peek()==='+'||peek()==='-'){const op=take(),r=term();n=op==='+'?n+r:n-r}return n}
+      const value=expression();if(i!==tokens.length)throw Error('Unerwarteter Ausdruck ab „'+tokens[i]+'“.');if(!Number.isFinite(value))throw Error('Das Ergebnis ist keine gültige Zahl.');return value;
+    }
+    function renderTool(key){
+      const tool=tools[key];if(!tool)return;
+      $('#heading').textContent=tool.name;$('#hint').textContent=tool.hint;input.value='';setResult('Ergebnis erscheint hier.');actions.innerHTML='';
+      tool.render();modal.classList.add('open');input.focus();
+    }
     const tools={
-      calc:{name:'Rechner',hint:'Unterstützt +, -, *, /, Prozent und Klammern.',buttons:[['Berechnen',()=>{try{const s=input.value.trim();if(!s||!/^[0-9+\-*/().,%\s]+$/.test(s))throw 0;const n=Function('"use strict";return ('+s.replace(/%/g,'/100')+')')();if(!Number.isFinite(n))throw 0;result.textContent=new Intl.NumberFormat('de-DE').format(n)}catch{result.textContent='Ungültiger Ausdruck.'}}]]},
-      json:{name:'JSON Formatter',hint:'JSON einfügen, formatieren oder minifizieren.',buttons:[['Formatieren',()=>convert(v=>JSON.stringify(JSON.parse(v),null,2))],['Minifizieren',()=>convert(v=>JSON.stringify(JSON.parse(v)))],['Kopieren',()=>copyResult()]]},
-      text:{name:'Text Converter',hint:'Text umwandeln.',buttons:[['GROSS',()=>result.textContent=input.value.toLocaleUpperCase('de-DE')],['klein',()=>result.textContent=input.value.toLocaleLowerCase('de-DE')],['Title Case',()=>result.textContent=input.value.toLocaleLowerCase('de-DE').replace(/\b\p{L}/gu,c=>c.toLocaleUpperCase('de-DE'))],['Trim',()=>result.textContent=input.value.split('\n').map(x=>x.trim()).join('\n').trim()]]},
-      base64:{name:'Base64',hint:'UTF-8-Text codieren oder decodieren.',buttons:[['Codieren',()=>{result.textContent=btoa(unescape(encodeURIComponent(input.value)))}],['Decodieren',()=>{try{result.textContent=decodeURIComponent(escape(atob(input.value.trim())))}catch{result.textContent='Ungültiger Base64-Text.'}}]]}
+      calc:{name:'Rechner',hint:'Rechnet mit +, −, ×, ÷, Modulo, Potenzen, Klammern und Prozent (z. B. 19%). Dezimal-Komma wird unterstützt.',render(){
+        input.placeholder='z. B. (125 + 39) * 1,19';
+        addButton('Berechnen',()=>{try{const n=parseCalculation(input.value);setResult(new Intl.NumberFormat('de-DE',{maximumFractionDigits:10}).format(n))}catch(e){setResult('Fehler: '+e.message)}},true);
+        addButton('Leeren',()=>{input.value='';setResult('Ergebnis erscheint hier.');input.focus()});
+      }},
+      json:{name:'JSON Formatter',hint:'JSON einfügen, prüfen, lesbar formatieren oder kompakt minifizieren.',render(){
+        input.placeholder='{"name":"Max","active":true}';
+        addButton('Formatieren',()=>{try{setResult(JSON.stringify(JSON.parse(input.value),null,2))}catch(e){setResult('Ungültiges JSON: '+e.message)}},true);
+        addButton('Minifizieren',()=>{try{setResult(JSON.stringify(JSON.parse(input.value)))}catch(e){setResult('Ungültiges JSON: '+e.message)}});
+        addButton('Validieren',()=>{try{JSON.parse(input.value);setResult('Das JSON ist gültig ✓')}catch(e){setResult('Ungültiges JSON: '+e.message)}});
+        addButton('Ergebnis kopieren',copyResult);
+      }},
+      text:{name:'Text Converter',hint:'Text umwandeln, bereinigen und analysieren. Das Ergebnis kannst du anschließend kopieren.',render(){
+        input.placeholder='Deinen Text hier eingeben …';
+        addButton('GROSSBUCHSTABEN',()=>setResult(input.value.toLocaleUpperCase('de-DE')),true);
+        addButton('kleinbuchstaben',()=>setResult(input.value.toLocaleLowerCase('de-DE')));
+        addButton('Title Case',()=>setResult(input.value.toLocaleLowerCase('de-DE').replace(/(^|[\s\-–—])(\p{L})/gu,(_,space,letter)=>space+letter.toLocaleUpperCase('de-DE'))));
+        addButton('Trim',()=>setResult(input.value.split('\n').map(line=>line.trim()).join('\n').trim()));
+        addButton('Zeilen deduplizieren',()=>setResult([...new Set(input.value.split(/\r?\n/))].join('\n')));
+        addButton('Text umdrehen',()=>setResult(Array.from(input.value).reverse().join('')));
+        addButton('Statistik',()=>{const s=input.value;setResult('Zeichen: '+Array.from(s).length+'\nZeichen (ohne Leerzeichen): '+s.replace(/\s/g,'').length+'\nWörter: '+(s.trim()?s.trim().split(/\s+/).length:0)+'\nZeilen: '+(s? s.split(/\r\n|\r|\n/).length:0))});
+        addButton('Ergebnis kopieren',copyResult);
+      }},
+      base64:{name:'Base64',hint:'Text sicher als UTF-8 codieren oder Base64 wieder in Text umwandeln.',render(){
+        input.placeholder='Text oder Base64 eingeben …';
+        addButton('Codieren →',()=>{try{const bytes=new TextEncoder().encode(input.value);let binary='';bytes.forEach(byte=>binary+=String.fromCharCode(byte));setResult(btoa(binary))}catch(e){setResult('Codieren fehlgeschlagen: '+e.message)}},true);
+        addButton('← Decodieren',()=>{try{const binary=atob(input.value.replace(/\s/g,''));const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));setResult(new TextDecoder('utf-8',{fatal:true}).decode(bytes))}catch{setResult('Ungültiger Base64-Text oder keine gültige UTF-8-Zeichenfolge.')}});
+        addButton('Ergebnis kopieren',copyResult);
+      }}
     };
-    function convert(fn){try{result.textContent=fn(input.value)}catch(e){result.textContent='Fehler: '+e.message}}
-    function copyResult(){navigator.clipboard.writeText(result.textContent).then(()=>{const old=result.textContent;result.textContent='In Zwischenablage kopiert ✓';setTimeout(()=>result.textContent=old,1200)}).catch(()=>{result.textContent='Kopieren nicht möglich.'})}
-    document.querySelectorAll('[data-tool]').forEach(button=>button.addEventListener('click',()=>{
-      const tool=tools[button.dataset.tool];$('#heading').textContent=tool.name;$('#hint').textContent=tool.hint;input.value='';result.textContent='Ergebnis erscheint hier.';actions.innerHTML='';
-      tool.buttons.forEach(([label,fn],index)=>{const b=document.createElement('button');b.type='button';b.className='action-btn '+(index===0?'primary':'subtle');b.textContent=label;b.addEventListener('click',fn);actions.append(b)});
-      modal.classList.add('open');input.focus();
-    }));
+    document.querySelectorAll('[data-tool]').forEach(button=>button.addEventListener('click',()=>renderTool(button.dataset.tool)));
+    const searchInput=$('#search');
+    const toolCards=[...document.querySelectorAll('[data-tool]')];
+    const noResults=document.createElement('div');noResults.className='col-12 hidden';noResults.id='noResults';noResults.innerHTML='<div class="text-center py-5"><div class="fs-2 mb-2">⌕</div><strong>Keine Werkzeuge gefunden</strong><p class="privacy-note mb-0">Versuche einen anderen Suchbegriff.</p></div>';
+    $('#toolGrid').append(noResults);
+    searchInput.addEventListener('input',()=>{
+      const query=searchInput.value.trim().toLocaleLowerCase('de-DE');let visible=0;
+      toolCards.forEach(button=>{
+        const card=button.closest('.col-6');const haystack=(button.innerText+' '+(button.dataset.keywords||'')).toLocaleLowerCase('de-DE');
+        const match=!query||haystack.includes(query);card.classList.toggle('hidden',!match);if(match)visible++;
+      });
+      noResults.classList.toggle('hidden',visible!==0);
+    });
+    searchInput.addEventListener('keydown',e=>{if(e.key==='Escape'){searchInput.value='';searchInput.dispatchEvent(new Event('input'))}});
     $('#close').addEventListener('click',()=>modal.classList.remove('open'));
     modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){modal.classList.remove('open');themeMenu.classList.remove('open')}});
